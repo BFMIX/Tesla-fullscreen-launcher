@@ -142,10 +142,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getOptimizedUrl(url) {
         const normalized = normalizeUrl(url);
-        if (isYouTube(normalized)) {
-            return `https://www.youtube.com/redirect?q=${encodeURIComponent(normalized)}`;
+        
+        // Évite le double wrapping si c'est déjà un lien de redirection YouTube
+        if (normalized.startsWith('https://www.youtube.com/redirect?q=')) {
+            return normalized;
         }
-        return normalized;
+        
+        // Enveloppe systématiquement l'URL dans la redirection YouTube pour forcer le mode plein écran
+        return `https://www.youtube.com/redirect?q=${encodeURIComponent(normalized)}`;
     }
 
     // ==========================================================================
