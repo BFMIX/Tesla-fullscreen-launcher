@@ -393,14 +393,15 @@ body {
 
 .raccourcis-scroll {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 16px;
-    overflow-x: auto;
     padding-bottom: 8px;
 }
 
 .raccourcis-list {
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
 }
 
@@ -474,21 +475,7 @@ body {
 }
 
 .slider-dots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 16px;
-}
-
-.slider-dots .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--text-muted);
-}
-
-.slider-dots .dot.active {
-    background-color: var(--text-primary);
+    display: none;
 }
 
 /* ==========================================================================

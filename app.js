@@ -282,22 +282,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handles Tap vs Long Press gesture for in-car touch screen
+    // Handles Tap vs Long Press gesture for in-car touch screen.
+    // Properly ignores taps when the user is scrolling/swiping.
     function setupCardInteraction(element, favorite) {
         let pressTimer = null;
         let isLongPress = false;
+        let isScrolling = false;
 
-        const startPress = () => {
+        const startPress = (e) => {
             isLongPress = false;
+            isScrolling = false;
             pressTimer = setTimeout(() => {
                 isLongPress = true;
                 openOptionsModal(favorite);
             }, 600); // 600ms hold triggers options
         };
 
+        const movePress = () => {
+            isScrolling = true;
+            clearTimeout(pressTimer);
+        };
+
         const endPress = (e) => {
             clearTimeout(pressTimer);
-            if (!isLongPress && e.type !== 'touchmove') {
+            if (isScrolling) return; // Ignore if they were swiping/scrolling
+            
+            if (!isLongPress) {
                 // Regular tap triggers optimized launch directly
                 launch(favorite.url, 'optimized');
             }
@@ -308,8 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
         element.addEventListener('mouseleave', () => clearTimeout(pressTimer));
 
         element.addEventListener('touchstart', startPress, { passive: true });
+        element.addEventListener('touchmove', movePress, { passive: true });
         element.addEventListener('touchend', endPress, { passive: true });
-        element.addEventListener('touchmove', () => clearTimeout(pressTimer), { passive: true });
     }
 
     function addFavorite(name, url, iconName) {
@@ -603,4 +613,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFavorites();
     renderHistory();
     updateClearButtonState();
+
+    // Reset transition screen and go back to home screen on back-button navigation
+    window.addEventListener('pageshow', (event) => {
+        showView('view-accueil');
+        const progress = document.getElementById('redirect-progress');
+        if (progress) progress.style.width = '0%';
+    });
 });
