@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Navigation shortcuts
     document.getElementById('nav-to-fav').addEventListener('click', () => showView('view-favoris'));
     document.getElementById('nav-to-hist').addEventListener('click', () => showView('view-history'));
+    document.getElementById('nav-to-help').addEventListener('click', () => showView('view-help'));
     document.getElementById('btn-quick-add').addEventListener('click', () => {
         // Clear input form
         document.getElementById('fav-url-input').value = document.getElementById('url-input').value;
@@ -152,6 +153,43 @@ document.addEventListener('DOMContentLoaded', () => {
         return `https://www.youtube.com/redirect?q=${encodeURIComponent(normalized)}`;
     }
 
+    function getHelperLoginUrl(rawUrl) {
+        try {
+            const url = new URL(normalizeUrl(rawUrl));
+            const host = url.hostname.toLowerCase();
+            
+            if (host.includes('canalplus.com') || host.includes('mycanal.fr')) {
+                return 'https://pass.canalplus.com/log/in?dest=' + encodeURIComponent('https://www.canalplus.com/');
+            }
+            if (host.includes('xhamster.com') || host.includes('xhamster3.com')) {
+                return 'https://xhamster.com/login';
+            }
+            if (host.includes('netflix.com')) {
+                return 'https://www.netflix.com/login';
+            }
+            if (host.includes('disneyplus.com')) {
+                return 'https://www.disneyplus.com/login';
+            }
+            if (host.includes('youtube.com') || host.includes('youtu.be')) {
+                return 'https://accounts.google.com/ServiceLogin';
+            }
+            if (host.includes('plex.tv')) {
+                return 'https://app.plex.tv/desktop/#!/login';
+            }
+            if (host.includes('twitch.tv')) {
+                return 'https://www.twitch.tv/login';
+            }
+            if (host.includes('spotify.com')) {
+                return 'https://accounts.spotify.com/login';
+            }
+            
+            // Guess login URL by appending to origin
+            return url.origin + '/login';
+        } catch (e) {
+            return rawUrl;
+        }
+    }
+
     // ==========================================================================
     // 3. Execution & Progress Bar Redirection UI
     // ==========================================================================
@@ -197,6 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (launchUrl) {
         const target = getOptimizedUrl(launchUrl);
         if (target) {
+            // Remove parameters from history so Back button goes to clean home screen!
+            try {
+                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+            } catch (e) {
+                console.error("replaceState failed", e);
+            }
             window.location.replace(target);
             return;
         }
@@ -480,6 +525,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('opt-helper-login').addEventListener('click', () => {
+        if (selectedFavorite) {
+            const helperUrl = getHelperLoginUrl(selectedFavorite.url);
+            launch(helperUrl, 'optimized');
+            closeOptionsModal();
+        }
+    });
+
     document.getElementById('opt-copy').addEventListener('click', () => {
         if (selectedFavorite) {
             const targetUrl = getOptimizedUrl(selectedFavorite.url);
@@ -616,6 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset transition screen and go back to home screen on back-button navigation
     window.addEventListener('pageshow', (event) => {
+        viewHistory = ['view-accueil'];
         showView('view-accueil');
         const progress = document.getElementById('redirect-progress');
         if (progress) progress.style.width = '0%';

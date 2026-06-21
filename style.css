@@ -904,6 +904,7 @@ body {
 .blue-icon { background-color: rgba(19, 75, 156, 0.15); color: #2196f3; }
 .gray-icon { background-color: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }
 .red-icon { background-color: rgba(229, 57, 53, 0.15); color: var(--color-red); }
+.orange-icon { background-color: rgba(239, 108, 0, 0.15); color: #ff9800; }
 
 .modal-action-details {
     display: flex;
@@ -1077,3 +1078,60 @@ body {
         gap: 12px;
     }
 }
+
+/* Help Section Styles */
+.help-content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.help-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.help-card-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff9800;
+    flex-shrink: 0;
+}
+
+.help-card-icon-wrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.help-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.help-card-text h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.help-card-text p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+

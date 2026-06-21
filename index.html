@@ -29,6 +29,9 @@
                     <button id="nav-to-hist" class="header-btn" title="Historique">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
                     </button>
+                    <button id="nav-to-help" class="header-btn" title="Aide & Astuces de connexion">
+                        <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+                    </button>
                     <span class="header-time">16:20</span>
                 </div>
             </header>
@@ -254,6 +257,17 @@
                         <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                     </button>
 
+                    <button id="opt-helper-login" class="modal-action-row">
+                        <div class="modal-icon-wrapper orange-icon">
+                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 8c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V8z"/></svg>
+                        </div>
+                        <div class="modal-action-details">
+                            <span class="modal-action-name">Connexion Assistée</span>
+                            <span class="modal-action-desc">Résout les bugs de connexion/popups en plein écran</span>
+                        </div>
+                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                    </button>
+
                     <button id="opt-copy" class="modal-action-row">
                         <div class="modal-icon-wrapper gray-icon">
                             <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
@@ -308,6 +322,63 @@
                 </div>
                 
                 <p class="redirect-fallback-tip">Si la page ne se charge pas, essayez "Ouvrir Direct".</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 7. AIDE & ASTUCES DE CONNEXION -->
+        <!-- ========================================== -->
+        <section id="view-help" class="app-view hidden">
+            <!-- Header -->
+            <header class="view-header">
+                <div class="header-left">
+                    <button class="back-btn">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                    </button>
+                    <span class="header-title">TESLA LAUNCHER</span>
+                </div>
+                <div class="header-right">
+                    <span class="header-time">16:20</span>
+                </div>
+            </header>
+
+            <!-- Body -->
+            <div class="view-body">
+                <div class="section-title-row">
+                    <h2 class="view-title">Aide & Connexions</h2>
+                </div>
+                
+                <div class="help-content-list">
+                    <div class="help-card">
+                        <div class="help-card-icon-wrapper">
+                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 8c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V8z"/></svg>
+                        </div>
+                        <div class="help-card-text">
+                            <h3>Pourquoi mes connexions ne sont pas partagées ?</h3>
+                            <p>Le système de votre Tesla sépare le navigateur web standard et le conteneur YouTube/Théâtre (Mode Optimisé) dans deux profils Chromium différents. Les cookies et identifiants saisis dans le navigateur standard ne sont pas accessibles en mode Plein Écran (Optimisé). Vous devez vous connecter directement en Mode Optimisé.</p>
+                        </div>
+                    </div>
+
+                    <div class="help-card">
+                        <div class="help-card-icon-wrapper">
+                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-9 14H5v-5h5v5zm0-6H5V7h5v5zm9 6h-7v-5h7v5zm0-6h-7V7h7v5z"/></svg>
+                        </div>
+                        <div class="help-card-text">
+                            <h3>Le bouton Connexion ne fait rien ?</h3>
+                            <p>Certains sites (ex: Canal+) ouvrent leur formulaire de connexion dans une nouvelle fenêtre contextuelle (popup / <code>window.open</code>). Cette action est bloquée par la sandbox du lecteur multimédia Tesla. <br><strong>Solution :</strong> Utilisez l'option <strong>"Connexion Assistée"</strong> dans le menu des options (appui long sur le favori) pour charger la page de connexion directement en plein écran.</p>
+                        </div>
+                    </div>
+
+                    <div class="help-card">
+                        <div class="help-card-icon-wrapper">
+                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.1 13.9c-.2.3-.5.4-.8.2-2.4-1.5-5.5-1.8-9.1-1-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.9-.9 7.4-.5 10.1 1.2.3.1.4.5.1.8zm1.2-2.7c-.3.4-.8.5-1.2.3-2.8-1.7-7-2.2-10.2-1.2-.5.1-1-.1-1.2-.6-.1-.5.1-1 .6-1.2 3.8-1.2 8.5-.6 11.7 1.4.4.2.5.8.3 1.3z"/></svg>
+                        </div>
+                        <div class="help-card-text">
+                            <h3>Impossible de se connecter à Google / YouTube ?</h3>
+                            <p>Google bloque les connexions issues d'applications tierces non reconnues. <br><strong>Astuce :</strong> Ouvrez un favori comme <strong>Plex</strong> ou <strong>Spotify</strong> en Mode Optimisé, cliquez sur <em>Se connecter avec Google</em>, puis effectuez la connexion. Les cookies Google étant partagés, vous serez automatiquement connecté lorsque vous ouvrirez YouTube en plein écran !</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
