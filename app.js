@@ -3,6 +3,9 @@
    Matches the 6 UI views, dialog overlays, and redirection screen transitions
    ========================================================================== */
 
+// Favicon fetch cache to avoid repeated requests for the same URL during a session
+const faviconFetchCache = new Set();
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================================================
@@ -45,12 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Preseeded premium favorites
     const DEFAULT_FAVORITES = [
-        { id: 'fav-1', name: 'YouTube TV', url: 'https://www.youtube.com', icon: 'youtube' },
-        { id: 'fav-2', name: 'Twitch Popout', url: 'https://www.twitch.tv', icon: 'twitch' },
-        { id: 'fav-3', name: 'Plex Web', url: 'https://app.plex.tv/desktop', icon: 'plex' },
-        { id: 'fav-4', name: 'Netflix', url: 'https://netflix.com', icon: 'netflix' },
-        { id: 'fav-5', name: 'Disney+', url: 'https://disneyplus.com', icon: 'disney' },
-        { id: 'fav-6', name: 'IPTV', url: 'https://iptv-smarters.com', icon: 'iptv' }
+        { id: 'fav-1', name: 'YouTube TV', url: 'https://www.youtube.com', icon: 'youtube', launchMode: 'optimized' },
+        { id: 'fav-2', name: 'Twitch Popout', url: 'https://www.twitch.tv', icon: 'twitch', launchMode: 'optimized' },
+        { id: 'fav-3', name: 'Plex Web', url: 'https://app.plex.tv/desktop', icon: 'plex', launchMode: 'optimized' },
+        { id: 'fav-4', name: 'Netflix', url: 'https://netflix.com', icon: 'netflix', launchMode: 'optimized' },
+        { id: 'fav-5', name: 'Disney+', url: 'https://disneyplus.com', icon: 'disney', launchMode: 'optimized' },
+        { id: 'fav-6', name: 'IPTV', url: 'https://iptv-smarters.com', icon: 'iptv', launchMode: 'optimized' }
     ];
 
     // Navigation state history (for back buttons)
@@ -117,9 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function isYouTube(url) {
         try {
             const hostname = new URL(url).hostname.toLowerCase();
-            return hostname.includes('youtube.com') || hostname === 'youtu.be';
+            // Matches youtube.com, www.youtube.com, m.youtube.com, youtube-nocookie.com, music.youtube.com, youtu.be
+            return hostname.match(/^(www\.)?(m\.)?youtube(-nocookie)?\.(com|be)$/) || hostname === 'youtu.be';
         } catch (e) {
-            return url.toLowerCase().includes('youtube.com') || url.toLowerCase().includes('youtu.be');
+            return url.toLowerCase().match(/youtube(-nocookie)?\.(com|be)/) || url.toLowerCase().includes('youtu.be');
         }
     }
 
@@ -129,15 +133,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const hasSpace = val.includes(' ');
         const hasDot = val.includes('.');
-        
+
         if (hasSpace || !hasDot) {
             return 'https://www.google.com/search?q=' + encodeURIComponent(val);
         }
 
-        if (!/^https?:\/\//i.test(val)) {
-            val = 'https://' + val;
+        // Ensure we don't double-prefix if http:// or https:// already present
+        if (/^https?:\/\//i.test(val)) {
+            // Already has a protocol, return as‑is
+            return val;
         }
 
+        val = 'https://' + val;
         return val;
     }
 
@@ -272,17 +279,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Render Homepage scroll Shortcuts (max 7 items)
         const shortcutContainer = document.getElementById('raccourcis-container');
         shortcutContainer.innerHTML = '';
-        
+
         favs.slice(0, 7).forEach(fav => {
             const item = document.createElement('div');
             item.className = 'raccourci-item';
             const iconObj = BRAND_ICONS[fav.icon] || BRAND_ICONS.globe;
-            
+            let iconUrl = fav.iconUrl || '';
+            let hasCustomIcon = !!iconUrl;
+
+            // If no iconUrl and we haven't tried to fetch it yet, initiate fetch
+            if (!iconUrl && !faviconFetchCache.has(fav.url)) {
+                faviconFetchCache.add(fav.url);
+                fetchFavicon(fav.url).then(fetchedIconUrl => {
+                    if (fetchedIconUrl) {
+                        // Update the favorite in localStorage
+                        const favs = getFavorites();
+                        const favIndex = favs.findIndex(f => f.id === fav.id);
+                        if (favIndex >= 0) {
+                            favs[favIndex].iconUrl = fetchedIconUrl;
+                            saveFavorites(favs);
+                        }
+                    }
+                });
+            }
+
+            const displayName = fav.name || getHostFromURL(fav.url) || 'Site';
             item.innerHTML = `
-                <div class="raccourci-icon-wrapper ${iconObj.bgClass}">
-                    ${iconObj.svg}
+                <div class="raccourci-icon-wrapper ${hasCustomIcon ? '' : iconObj.bgClass}" ${hasCustomIcon && isSafeUrl(iconUrl) ? `style="background-image:url(${iconUrl});background-size:contain;background-repeat:no-repeat;background-position:center;"` : ''}>
+                    ${!hasCustomIcon ? iconObj.svg : ''}
                 </div>
-                <span class="raccourci-name">${escapeHtml(fav.name)}</span>
+                <span class="raccourci-name">${escapeHtml(displayName)}</span>
+                <span class="launch-mode-indicator" title="Mode de lancement">${fav.launchMode === 'optimized' ? '🚀' : '↔️'}</span>
             `;
 
             // Setup click & long-press behaviors
@@ -298,16 +325,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.className = 'favorite-card';
             const iconObj = BRAND_ICONS[fav.icon] || BRAND_ICONS.globe;
-            
+            let iconUrl = fav.iconUrl || '';
+            let hasCustomIcon = !!iconUrl;
+
+            // If no iconUrl and we haven't tried to fetch it yet, initiate fetch
+            if (!iconUrl && !faviconFetchCache.has(fav.url)) {
+                faviconFetchCache.add(fav.url);
+                fetchFavicon(fav.url).then(fetchedIconUrl => {
+                    if (fetchedIconUrl) {
+                        // Update the favorite in localStorage
+                        const favs = getFavorites();
+                        const favIndex = favs.findIndex(f => f.id === fav.id);
+                        if (favIndex >= 0) {
+                            favs[favIndex].iconUrl = fetchedIconUrl;
+                            saveFavorites(favs);
+                        }
+                    }
+                });
+            }
+
             let displayUrl = fav.url.replace(/^https?:\/\/(www\.)?/i, '');
             if (displayUrl.length > 25) displayUrl = displayUrl.substring(0, 22) + '...';
 
             item.innerHTML = `
-                <div class="favorite-card-icon-bg ${iconObj.bgClass}">
-                    ${iconObj.svg}
+                <div class="favorite-card-icon-bg ${hasCustomIcon ? '' : iconObj.bgClass}" ${hasCustomIcon && isSafeUrl(iconUrl) ? `style="background-image:url(${iconUrl});background-size:contain;background-repeat:no-repeat;background-position:center;"` : ''}>
+                    ${!hasCustomIcon ? iconObj.svg : ''}
                 </div>
                 <div class="favorite-card-details">
                     <span class="favorite-card-title">${escapeHtml(fav.name)}</span>
+                    <span class="launch-mode-indicator" title="Mode de lancement">${fav.launchMode === 'optimized' ? '🚀' : '↔️'}</span>
                     <span class="favorite-card-url">${escapeHtml(displayUrl)}</span>
                 </div>
                 <button class="favorite-card-delete" data-id="${fav.id}">&times;</button>
@@ -334,7 +380,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let isLongPress = false;
         let isScrolling = false;
 
+        // Check if event target is within an element that should not trigger press behavior
+        function shouldIgnoreEvent(e) {
+            // Ignore events from delete buttons (when in edit mode)
+            if (e.target.closest('.favorite-card-delete')) {
+                return true;
+            }
+            // Could add other elements to ignore here in the future
+            return false;
+        }
+
         const startPress = (e) => {
+            if (shouldIgnoreEvent(e)) return;
             isLongPress = false;
             isScrolling = false;
             pressTimer = setTimeout(() => {
@@ -343,18 +400,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 600); // 600ms hold triggers options
         };
 
-        const movePress = () => {
+        const movePress = (e) => {
+            if (shouldIgnoreEvent(e)) return;
             isScrolling = true;
             clearTimeout(pressTimer);
         };
 
         const endPress = (e) => {
+            if (shouldIgnoreEvent(e)) return;
             clearTimeout(pressTimer);
             if (isScrolling) return; // Ignore if they were swiping/scrolling
-            
+
             if (!isLongPress) {
-                // Regular tap triggers optimized launch directly
-                launch(favorite.url, 'optimized');
+                // Regular tap uses favorite's launch mode
+                launch(favorite.url, favorite.launchMode);
             }
         };
 
@@ -367,18 +426,21 @@ document.addEventListener('DOMContentLoaded', () => {
         element.addEventListener('touchend', endPress, { passive: true });
     }
 
-    function addFavorite(name, url, iconName) {
+    async function addFavorite(name, url, iconName) {
         const cleanUrl = normalizeUrl(url);
         if (!cleanUrl) return;
 
         const cleanName = name.trim() || cleanUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
         const favs = getFavorites();
-        
+        const iconUrl = await fetchFavicon(cleanUrl);
+
         const newFav = {
             id: 'fav-' + Date.now(),
             name: cleanName,
             url: cleanUrl,
-            icon: iconName
+            icon: iconName,
+            iconUrl: iconUrl,
+            launchMode: 'optimized'
         };
 
         favs.push(newFav);
@@ -387,6 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function deleteFavorite(id) {
+        if (!confirm('Voulez-vous vraiment supprimer ce favori ?')) return;
         let favs = getFavorites();
         favs = favs.filter(f => f.id !== id);
         saveFavorites(favs);
@@ -426,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function deleteHistoryItem(url) {
+        if (!confirm('Voulez-vous vraiment supprimer cet élément de l\'historique ?')) return;
         let history = getHistory();
         history = history.filter(item => item.url !== url);
         saveHistory(history);
@@ -637,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('btn-save-favorite').addEventListener('click', () => {
+    document.getElementById('btn-save-favorite').addEventListener('click', async () => {
         const url = document.getElementById('fav-url-input').value;
         const name = document.getElementById('fav-label-input').value;
         if (!url) {
@@ -647,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => urlFormEl.classList.remove('shake-anim'), 400);
             return;
         }
-        addFavorite(name, url, selectedFormIcon);
+        await addFavorite(name, url, selectedFormIcon);
     });
 
     // Helper HTML Escape
@@ -667,6 +731,36 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHistory();
     updateClearButtonState();
 
+    // Helper to extract hostname from URL for display
+    function getHostFromURL(url) {
+        try {
+            const urlObj = new URL(url);
+            let host = urlObj.hostname;
+            if (host.startsWith('www.')) {
+                host = host.slice(4);
+            }
+            return host;
+        } catch {
+            return '';
+        }
+    }
+
+    // Favicon helper
+    async function fetchFavicon(url) {
+        try {
+            const hostname = new URL(url).hostname;
+            // Use Google's favicon service
+            return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+        } catch (e) {
+            // fallback to empty string
+            return '';
+        }
+    }
+
+    function isSafeUrl(url) {
+        return typeof url === 'string' && /^https?:\/\//i.test(url);
+    }
+
     // Reset transition screen and go back to home screen on back-button navigation
     window.addEventListener('pageshow', (event) => {
         viewHistory = ['view-accueil'];
@@ -674,4 +768,151 @@ document.addEventListener('DOMContentLoaded', () => {
         const progress = document.getElementById('redirect-progress');
         if (progress) progress.style.width = '0%';
     });
+
+    // Settings Modal Functionality
+    const settingsModal = document.getElementById('modal-settings');
+    const settingsBtn = document.getElementById('nav-to-settings');
+    const settingsCloseBtn = settingsModal.querySelector('.modal-close');
+
+    // Settings defaults
+    const defaultSettings = {
+        vibrationEnabled: true,
+        longPressDuration: 1000, // milliseconds
+        timeFormat24h: true
+    };
+
+    // Load settings from localStorage or use defaults
+    let settings = JSON.parse(localStorage.getItem('teslaLauncherSettings')) || {...defaultSettings};
+
+    // Save settings to localStorage
+    function saveSettings() {
+        localStorage.setItem('teslaLauncherSettings', JSON.stringify(settings));
+        applySettings();
+    }
+
+    // Apply settings to the UI and behavior
+    function applySettings() {
+        // Update UI controls to match current settings
+        document.getElementById('vibration-toggle').checked = settings.vibrationEnabled;
+        document.getElementById('long-press-slider').value = settings.longPressDuration;
+        document.getElementById('long-press-value').textContent = settings.longPressDuration + 'ms';
+        document.getElementById('time-format-toggle').checked = !settings.timeFormat24h; // Checked means 12h format
+
+        // Update header time format if element exists
+        const headerTime = document.querySelector('.header-time');
+        if (headerTime) {
+            updateHeaderTimeDisplay();
+        }
+
+        // Apply to any active haptic feedback if needed
+        // (Will be used when triggering vibrations)
+    }
+
+    // Update header time display based on settings
+    function updateHeaderTimeDisplay() {
+        const headerTime = document.querySelector('.header-time');
+        if (!headerTime) return;
+
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+
+        if (!settings.timeFormat24h) {
+            // 12-hour format
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours === 0 ? 12 : hours; // 0 becomes 12
+            headerTime.textContent = `${hours}:${minutes} ${ampm}`;
+        } else {
+            // 24-hour format
+            headerTime.textContent = `${hours.toString().padStart(2, '0')}:${minutes}`;
+        }
+    }
+
+    // Trigger haptic feedback if enabled
+    function triggerHapticFeedback() {
+        if (settings.vibrationEnabled && navigator.vibrate) {
+            navigator.vibrate(50); // 50ms vibration
+        }
+    }
+
+    // Open and close settings modal functions
+    function openSettingsModal() {
+        // Update modal with current settings before showing
+        document.getElementById('vibration-toggle').checked = settings.vibrationEnabled;
+        document.getElementById('long-press-slider').value = settings.longPressDuration;
+        document.getElementById('long-press-value').textContent = settings.longPressDuration + 'ms';
+        document.getElementById('time-format-toggle').checked = !settings.timeFormat24h; // Inverted for UI
+
+        settingsModal.classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+        settingsModal.classList.add('hidden');
+    }
+
+    // Event Listeners for Settings Modal
+    settingsBtn.addEventListener('click', () => {
+        openSettingsModal();
+        triggerHapticFeedback(); // Feedback for opening settings
+    });
+
+    settingsCloseBtn.addEventListener('click', () => {
+        closeSettingsModal();
+        triggerHapticFeedback(); // Feedback for closing settings
+    });
+
+    // Close modal when clicking outside content
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            closeSettingsModal();
+            triggerHapticFeedback(); // Feedback for closing settings
+        }
+    });
+
+    // Vibration toggle
+    document.getElementById('vibration-toggle').addEventListener('change', (e) => {
+        settings.vibrationEnabled = e.target.checked;
+        saveSettings();
+        triggerHapticFeedback(); // Feedback for change
+    });
+
+    // Long press slider
+    const longPressSlider = document.getElementById('long-press-slider');
+    const longPressValue = document.getElementById('long-press-value');
+
+    longPressSlider.addEventListener('input', (e) => {
+        const value = parseInt(e.target.value);
+        settings.longPressDuration = value;
+        longPressValue.textContent = value + 'ms';
+        // Save on change (could also use 'change' event for less frequent saves)
+        saveSettings();
+        triggerHapticFeedback(); // Feedback for change
+    });
+
+    // Time format toggle
+    document.getElementById('time-format-toggle').addEventListener('change', (e) => {
+        // When checked, it's 12h format (so timeFormat24h is false)
+        settings.timeFormat24h = !e.target.checked;
+        saveSettings();
+        triggerHapticFeedback(); // Feedback for change
+    });
+
+    // Reset to defaults
+    settingsModal.querySelector('.modal-action-row.text-red').addEventListener('click', () => {
+        if (confirm('Réinitialiser tous les paramètres aux valeurs par défaut ?')) {
+            settings = {...defaultSettings};
+            saveSettings();
+            triggerHapticFeedback(); // Feedback for reset
+        }
+    });
+
+    // Apply settings on load
+    applySettings();
+
+    // Update header time every minute
+    setInterval(updateHeaderTimeDisplay, 60000);
+
+    // Also update immediately if needed (in case page loads between minutes)
+    updateHeaderTimeDisplay();
 });

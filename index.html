@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tesla Fullscreen Launcher</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="asset/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="asset/icon.png" sizes="180x180">
 </head>
 <body>
     <div class="app-container">
@@ -16,9 +18,7 @@
             <!-- Header -->
             <header class="view-header">
                 <div class="header-left">
-                    <svg class="icon-logo" viewBox="0 0 100 100">
-                        <path fill="currentColor" d="M50 15c-1.3 0-14.7 9.8-19.7 13.9 6.8 2.2 13.5 3.3 19.7 3.3s12.9-1.1 19.7-3.3C64.7 24.8 51.3 15 50 15zm0 21.9c-7.8 0-16.7-1.7-24.9-5.1-.2.8-.3 1.7-.3 2.6 0 10.6 7.5 24 23 32.5l2.2 1.2 2.2-1.2c15.5-8.5 23-21.9 23-32.5 0-.9-.1-1.8-.3-2.6-8.2 3.4-17.1 5.1-24.9 5.1zm0 15.6c-4.2 0-8.8-.9-13.1-2.7 1.4 3.7 4 7 7.7 9.2l5.4 3.2 5.4-3.2c3.7-2.2 6.3-5.5 7.7-9.2-4.3 1.8-8.9 2.7-13.1 2.7z"/>
-                    </svg>
+                    <img src="asset/icon.png" alt="Tesla Launcher Icon" class="header-logo-img">
                     <span class="header-title">TESLA LAUNCHER</span>
                 </div>
                 <div class="header-right">
@@ -29,6 +29,10 @@
                     <button id="nav-to-hist" class="header-btn" title="Historique">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
                     </button>
+                    <button id="nav-to-settings" class="header-btn" title="Paramètres">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.22-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.23.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                        <span>Paramètres</span>
+                    </button>
                     <button id="nav-to-help" class="header-btn" title="Aide & Astuces de connexion">
                         <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
                     </button>
@@ -38,6 +42,9 @@
 
             <!-- Main Body -->
             <div class="view-body center-content">
+                <div class="home-logo-container">
+                    <img src="asset/Text logo home page.png" alt="Tesla Launcher Logo" class="home-logo">
+                </div>
                 <p class="input-label">Collez une URL ou recherchez un site</p>
                 
                 <!-- URL input console -->
@@ -48,10 +55,10 @@
 
                 <!-- Touch keyboard assist keys -->
                 <div class="touch-assist-row">
-                    <button class="assist-btn" data-value="https://">https://</button>
-                    <button class="assist-btn" data-value="www.">www.</button>
-                    <button class="assist-btn" data-value=".com">.com</button>
-                    <button class="assist-btn" data-value="/">/</button>
+                    <button class="assist-btn" data-value="https://"></button>
+                    <button class="assist-btn" data-value="www."></button>
+                    <button class="assist-btn" data-value=".com"></button>
+                    <button class="assist-btn" data-value="/"></button>
                 </div>
 
                 <!-- Launch Buttons -->
@@ -415,6 +422,80 @@
                 </div>
             </div>
         </footer>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Paramètres</span>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-actions-list">
+                <!-- Vibration Toggle -->
+                <div class="modal-action-row">
+                    <div class="modal-icon-wrapper blue-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6.5 6.5c0-1.77 1.43-3.2 3.2-3.2h3v2H9.7c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63h2.2v2H9.7c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63h2.2v2H9.7c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63h3c1.77 0 3.2-1.43 3.2-3.2v-3h2v3c0 1.77-1.43 3.2-3.2 3.2h-3v-2h3.2c.9 0 1.63-.73 1.63-1.63s-.73-1.63-1.63-1.63h-2.2v-2h2.2c.9 0 1.63-.73 1.63-1.63s-.73-1.63-1.63-1.63h-3v-2z"/></svg>
+                    </div>
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Retour haptique</span>
+                        <span class="modal-action-desc">Active la vibration lors des actions réussies</span>
+                    </div>
+                    <div class="modal-action-details">
+                        <label class="switch">
+                            <input type="checkbox" id="vibration-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Long Press Sensitivity -->
+                <div class="modal-action-row">
+                    <div class="modal-icon-wrapper blue-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Sensibilité du maintien appuyé</span>
+                        <span class="modal-action-desc">Ajuster le temps nécessaire pour considérer un maintien appuyé</span>
+                    </div>
+                    <div class="modal-action-details">
+                        <div class="slider-container">
+                            <input type="range" min="500" max="2000" value="1000" step="100" id="long-press-slider">
+                            <span id="long-press-value">1000ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Format -->
+                <div class="modal-action-row">
+                    <div class="modal-icon-wrapper blue-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 4.5L15.55 9l1.36-1.36L18 12l-3.91 3.91-1.36-1.36L12 16.5l-3.55 3.55-1.36 1.36L6 12l3.91-3.91z"/></svg>
+                    </div>
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Format de l'heure</span>
+                        <span class="modal-action-desc">Choisir entre l'affichage 12h ou 24h</span>
+                    </div>
+                    <div class="modal-action-details">
+                        <div class="toggle-group">
+                            <label class="toggle-label">24h</label>
+                            <input type="checkbox" id="time-format-toggle">
+                            <label class="toggle-label">12h</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset to Defaults -->
+                <div class="modal-action-row text-red">
+                    <div class="modal-icon-wrapper red-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14c-2.33 0-4.31-1.56-5.11-3.77l-.95 2.26c1.18 1.32 2.88 2.15 4.8 2.15s3.62-.83 4.8-2.15l-.95-2.26c-.8-2.21-2.78-3.77-5.11-3.77zM12 14c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+                    </div>
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Réinitialiser les paramètres</span>
+                        <span class="modal-action-desc">Restaurer toutes les valeurs par défaut</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Script File -->
