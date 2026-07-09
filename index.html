@@ -1,504 +1,267 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tesla Fullscreen Launcher</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="asset/icon.png" type="image/png">
     <link rel="apple-touch-icon" href="asset/icon.png" sizes="180x180">
 </head>
 <body>
     <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-brand-wrapper">
+                <img src="asset/header-logo.png" alt="Tesla Fullscreen Launcher" class="header-logo-img">
+            </div>
+            <div class="header-actions">
+                <button id="btn-help" class="header-action-btn" title="Help & Connection Guide">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+                </button>
+                <button id="btn-settings" class="header-action-btn" title="Settings">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.22-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.23.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                </button>
+                <span class="header-clock">--:--</span>
+            </div>
+        </header>
 
-        <!-- ========================================== -->
-        <!-- 1. ÉCRAN D'ACCUEIL - LAUNCHER -->
-        <!-- ========================================== -->
-        <section id="view-accueil" class="app-view">
-            <!-- Header -->
-            <header class="view-header">
-                <div class="header-left">
-                    <img src="asset/icon.png" alt="Tesla Launcher Icon" class="header-logo-img">
-                    <span class="header-title">TESLA LAUNCHER</span>
-                </div>
-                <div class="header-right">
-                    <button id="nav-to-fav" class="header-btn" title="Mes favoris">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        <span>Favoris</span>
-                    </button>
-                    <button id="nav-to-hist" class="header-btn" title="Historique">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-                    </button>
-                    <button id="nav-to-settings" class="header-btn" title="Paramètres">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.22-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.23.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
-                        <span>Paramètres</span>
-                    </button>
-                    <button id="nav-to-help" class="header-btn" title="Aide & Astuces de connexion">
-                        <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-                    </button>
-                    <span class="header-time">16:20</span>
-                </div>
-            </header>
-
-            <!-- Main Body -->
-            <div class="view-body center-content">
+        <!-- MAIN LAYOUT -->
+        <main class="app-main">
+            <!-- INPUT CONSOLE -->
+            <section class="console-section">
                 <div class="home-logo-container">
-                    <img src="asset/Text logo home page.png" alt="Tesla Launcher Logo" class="home-logo">
+                    <img src="asset/home-logo.png" alt="Tesla Launcher Logo" class="home-logo">
                 </div>
-                <p class="input-label">Collez une URL ou recherchez un site</p>
-                
-                <!-- URL input console -->
+                <div class="console-label-row">
+                    <span class="console-label">🔗 Paste a link or search</span>
+                </div>
                 <div class="console-input-wrapper">
                     <input type="text" id="url-input" placeholder="https://" autocomplete="off" spellcheck="false">
                     <button id="clear-btn" class="clear-btn-overlay">&times;</button>
                 </div>
-
-                <!-- Touch keyboard assist keys -->
+                <!-- Keyboard assists -->
                 <div class="touch-assist-row">
-                    <button class="assist-btn" data-value="https://"></button>
-                    <button class="assist-btn" data-value="www."></button>
-                    <button class="assist-btn" data-value=".com"></button>
-                    <button class="assist-btn" data-value="/"></button>
+                    <button class="assist-btn" data-value="https://">https://</button>
+                    <button class="assist-btn" data-value="www.">www.</button>
+                    <button class="assist-btn" data-value=".com">.com</button>
+                    <button class="assist-btn" data-value="/">/</button>
                 </div>
+                <!-- Launch Controls -->
+                <div class="launch-controls">
+                    <button id="btn-optimized" class="btn-launch-primary">OPEN FULLSCREEN</button>
+                    <button id="btn-direct" class="btn-launch-secondary">Open normally</button>
+                </div>
+            </section>
 
-                <!-- Launch Buttons -->
-                <div class="launch-actions">
-                    <button id="btn-direct" class="action-card btn-gray">
-                        <div class="action-icon-bg">
-                            <svg class="action-icon" viewBox="0 0 24 24"><path d="M5 13c0-5.07 4.9-9 9-9s4 3.93 4 9H5zm12.3-4.29l1.41-1.41a1 1 0 0 0-1.41-1.42l-1.41 1.41a1 1 0 0 0 1.41 1.42zm-10.6 0a1 1 0 0 0 1.41-1.42L6.7 5.88a1 1 0 0 0-1.41 1.42l1.41 1.41zM12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7 2h14v2H5v-2z"/></svg>
-                        </div>
-                        <div class="action-details">
-                            <span class="action-title-text">OUVRIR DIRECT</span>
-                            <span class="action-subtitle-text">Ouvre le lien normalement</span>
-                        </div>
+            <!-- QUICK APPS -->
+            <section class="quick-apps-section">
+                <div class="section-header">
+                    <span class="section-title">Quick Apps</span>
+                </div>
+                <div class="quick-apps-grid">
+                    <button class="quick-app-btn" data-app="youtube">
+                        <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" onerror="this.src='asset/icon.png'" alt="YouTube">
+                        <span>YouTube</span>
                     </button>
-
-                    <button id="btn-optimized" class="action-card btn-blue">
-                        <div class="action-icon-bg">
-                            <svg class="action-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-                        </div>
-                        <div class="action-details">
-                            <span class="action-title-text">OUVRIR OPTIMISÉ</span>
-                            <span class="action-subtitle-text">Mode plein écran optimisé</span>
-                        </div>
+                    <button class="quick-app-btn" data-app="twitch">
+                        <img src="https://www.google.com/s2/favicons?domain=twitch.tv&sz=64" onerror="this.src='asset/icon.png'" alt="Twitch">
+                        <span>Twitch</span>
+                    </button>
+                    <button class="quick-app-btn" data-app="plex">
+                        <img src="https://www.google.com/s2/favicons?domain=plex.tv&sz=64" onerror="this.src='asset/icon.png'" alt="Plex">
+                        <span>Plex</span>
+                    </button>
+                    <button class="quick-app-btn" data-app="jellyfin">
+                        <img src="https://www.google.com/s2/favicons?domain=jellyfin.org&sz=64" onerror="this.src='asset/icon.png'" alt="Jellyfin">
+                        <span>Jellyfin</span>
                     </button>
                 </div>
+            </section>
 
-                <!-- Quick Raccourcis -->
-                <div class="raccourcis-section">
-                    <p class="section-label">RACCOURCIS RAPIDES</p>
-                    <div class="raccourcis-scroll">
-                        <div id="raccourcis-container" class="raccourcis-list">
-                            <!-- Populated by JS -->
-                        </div>
-                        <button id="btn-quick-add" class="raccourci-item add-item">
-                            <div class="raccourci-icon-wrapper add-icon">
-                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                            </div>
-                            <span class="raccourci-name">Ajouter</span>
-                        </button>
+            <!-- FAVORITES / SMART CARDS CAROUSEL -->
+            <section class="favorites-section">
+                <div class="section-header">
+                    <span class="section-title">Recent & Favorites</span>
+                    <button id="btn-edit-favorites" class="edit-favorites-btn">Edit</button>
+                </div>
+                <div class="carousel-outer">
+                    <div id="favorites-carousel" class="favorites-carousel">
+                        <!-- Dynamic Smart Cards Populated by JS -->
                     </div>
                 </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: REDIRECT (FULLSCREEN LOADER) -->
+    <div id="view-redirect" class="redirect-screen hidden">
+        <div class="redirect-content">
+            <div class="redirect-logo-wrapper">
+                <div class="monogram-logo">TF</div>
             </div>
-
-            <!-- Dashboard Slider indicator dots -->
-            <div class="slider-dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
+            <h2 class="redirect-title">Optimizing Viewport...</h2>
+            <p class="redirect-subtitle">Launching in Fullscreen Mode</p>
+            <div class="progress-bar-container">
+                <div id="redirect-progress" class="progress-bar-fill"></div>
             </div>
-        </section>
+            <p class="redirect-fallback-tip">If the page doesn't load, use "Open normally".</p>
+        </div>
+    </div>
 
-        <!-- ========================================== -->
-        <!-- 2. FAVORIS -->
-        <!-- ========================================== -->
-        <section id="view-favoris" class="app-view hidden">
-            <!-- Header -->
-            <header class="view-header">
-                <div class="header-left">
-                    <button class="back-btn">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                    </button>
-                    <span class="header-title">TESLA LAUNCHER</span>
-                </div>
-                <div class="header-right">
-                    <span class="header-time">16:20</span>
-                </div>
-            </header>
-
-            <!-- Body -->
-            <div class="view-body">
-                <div class="section-title-row">
-                    <h2 class="view-title">Mes favoris</h2>
-                    <button id="btn-edit-favs" class="control-btn">Modifier</button>
-                </div>
-                <div id="favorites-grid-full" class="favorites-grid-full">
-                    <!-- Populated by JS -->
-                </div>
+    <!-- MODALS OVERLAYS -->
+    <!-- ADD/EDIT FAVORITE MODAL -->
+    <div id="modal-add-favorite" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="fav-modal-title">Add to Favorites</span>
+                <button class="modal-close" id="btn-close-add-fav">&times;</button>
             </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- 3. HISTORIQUE -->
-        <!-- ========================================== -->
-        <section id="view-history" class="app-view hidden">
-            <!-- Header -->
-            <header class="view-header">
-                <div class="header-left">
-                    <button class="back-btn">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                    </button>
-                    <span class="header-title">TESLA LAUNCHER</span>
-                </div>
-                <div class="header-right">
-                    <span class="header-time">16:20</span>
-                </div>
-            </header>
-
-            <!-- Body -->
-            <div class="view-body">
-                <div class="section-title-row">
-                    <h2 class="view-title">Historique récent</h2>
-                    <button id="btn-clear-history-all" class="control-btn">Tout effacer</button>
-                </div>
-                <div id="history-list-full" class="history-list-full">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- 4. AJOUTER FAVORI -->
-        <!-- ========================================== -->
-        <section id="view-add-favorite" class="app-view hidden">
-            <!-- Header -->
-            <header class="view-header">
-                <div class="header-left">
-                    <button class="back-btn">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                    </button>
-                    <span class="header-title">TESLA LAUNCHER</span>
-                </div>
-                <div class="header-right">
-                    <span class="header-time">16:20</span>
-                </div>
-            </header>
-
-            <!-- Body -->
-            <div class="view-body center-content max-width-form">
-                <h2 class="view-title align-left">Ajouter aux favoris</h2>
-                
+            <div class="modal-body form-padding">
                 <div class="form-group">
-                    <label class="form-label" for="fav-url-input">Adresse URL</label>
-                    <input type="text" id="fav-url-input" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                    <label class="form-label" for="fav-url-input">URL Link</label>
+                    <input type="text" id="fav-url-input" placeholder="https://..." autocomplete="off">
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label" for="fav-label-input">Nom du favori</label>
-                    <input type="text" id="fav-label-input" placeholder="Ma vidéo YouTube" autocomplete="off">
+                    <label class="form-label" for="fav-label-input">Name</label>
+                    <input type="text" id="fav-label-input" placeholder="My Streaming Service" autocomplete="off">
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label">Icône</label>
+                    <label class="form-label">Icon</label>
                     <div id="icon-selector" class="icon-selector">
-                        <button class="selector-icon-item active" data-icon="youtube">
-                            <span class="icon-brand-color red-bg">
-                                <svg class="icon" viewBox="0 0 24 24"><path fill="#FFF" d="M23.5 12.4c0 0-.2-1.7-.9-2.5-.9-1-1.9-1-2.4-1.1-3.5-.2-8.7-.2-8.7-.2s-5.2 0-8.7.2c-.5 0-1.5.1-2.4 1.1-.7.8-.9 2.5-.9 2.5S-.1 14.1-.1 15.8v1.6c0 1.7.2 3.4.2 3.4s.2 1.7.9 2.5c.9 1 2.1 1 2.6 1.1 3.5.3 8.7.3 8.7.3s5.2 0 8.7-.3c.5 0 1.5-.1 2.4-1.1.7-.8.9-2.5.9-2.5s.2-1.7.2-3.4v-1.6c.1-1.7-.1-3.4-.1-3.4zM9.5 19.3V12.1l6.9 3.6-6.9 3.6z"/></svg>
-                            </span>
-                        </button>
-                        <button class="selector-icon-item" data-icon="twitch">
-                            <span class="icon-brand-color purple-bg">
-                                <svg class="icon" viewBox="0 0 24 24"><path fill="#FFF" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
-                            </span>
-                        </button>
-                        <button class="selector-icon-item" data-icon="plex">
-                            <span class="icon-brand-color gold-bg">
-                                <svg class="icon" viewBox="0 0 24 24"><path fill="#FFF" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5V13h2.5L12 9.5 8.5 13H11v3.5H9v1.5h6v-1.5h-2z"/></svg>
-                            </span>
-                        </button>
-                        <button class="selector-icon-item" data-icon="globe">
-                            <span class="icon-brand-color dark-bg">
-                                <svg class="icon" viewBox="0 0 24 24"><path fill="#FFF" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                            </span>
-                        </button>
-                        <button class="selector-icon-item" data-icon="star">
-                            <span class="icon-brand-color dark-bg">
-                                <svg class="icon" viewBox="0 0 24 24"><path fill="#FFF" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            </span>
-                        </button>
+                        <button class="selector-icon-item active" data-icon="youtube">YouTube</button>
+                        <button class="selector-icon-item" data-icon="twitch">Twitch</button>
+                        <button class="selector-icon-item" data-icon="plex">Plex</button>
+                        <button class="selector-icon-item" data-icon="globe">Web</button>
                     </div>
                 </div>
-
-                <button id="btn-save-favorite" class="btn-primary-large">ENREGISTRER</button>
+                <button id="btn-save-favorite" class="btn-modal-primary">SAVE FAVORITE</button>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- ========================================== -->
-        <!-- 5. OPTIONS AVANCÉES (LONG PRESS / ACTION DIALOG) -->
-        <!-- ========================================== -->
-        <div id="modal-options" class="modal-overlay hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title">Options</span>
-                    <button class="modal-close">&times;</button>
+    <!-- OPTIONS DIALOG MODAL -->
+    <div id="modal-options" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Options</span>
+                <button class="modal-close" id="btn-close-options">&times;</button>
+            </div>
+            <div class="modal-actions-list">
+                <button id="opt-direct" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Open normally</span>
+                        <span class="modal-action-desc">Open the link directly</span>
+                    </div>
+                </button>
+                <button id="opt-optimized" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Open optimized</span>
+                        <span class="modal-action-desc">Force Tesla Fullscreen Mode</span>
+                    </div>
+                </button>
+                <button id="opt-helper-login" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Assisted Login</span>
+                        <span class="modal-action-desc">Launch directly on the login page</span>
+                    </div>
+                </button>
+                <button id="opt-copy" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Copy link</span>
+                        <span class="modal-action-desc">Copy optimized fullscreen URL</span>
+                    </div>
+                </button>
+                <button id="opt-edit" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Edit favorite</span>
+                        <span class="modal-action-desc">Modify title, URL, or icon</span>
+                    </div>
+                </button>
+                <button id="opt-delete" class="modal-action-row text-red">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Delete</span>
+                        <span class="modal-action-desc">Remove from favorites</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div id="modal-help" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Help & Connection Guide</span>
+                <button class="modal-close" id="btn-close-help">&times;</button>
+            </div>
+            <div class="modal-body scrollable-modal-body">
+                <div class="help-item">
+                    <h4>Why aren't my logins shared?</h4>
+                    <p>Tesla isolates standard browsing and Fullscreen Media mode in separate Chromium profiles. You must log in directly while in Fullscreen mode.</p>
                 </div>
-                <div class="modal-actions-list">
-                    <button id="opt-direct" class="modal-action-row">
-                        <div class="modal-icon-wrapper blue-icon">
-                            <svg viewBox="0 0 24 24"><path d="M5 13c0-5.07 4.9-9 9-9s4 3.93 4 9H5zm12.3-4.29l1.41-1.41a1 1 0 0 0-1.41-1.42l-1.41 1.41a1 1 0 0 0 1.41 1.42zm-10.6 0a1 1 0 0 0 1.41-1.42L6.7 5.88a1 1 0 0 0-1.41 1.42l1.41 1.41zM12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7 2h14v2H5v-2z"/></svg>
-                        </div>
-                        <div class="modal-action-details">
-                            <span class="modal-action-name">Ouvrir direct</span>
-                            <span class="modal-action-desc">Ouvre le lien normalement</span>
-                        </div>
-                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                    </button>
-
-                    <button id="opt-optimized" class="modal-action-row">
-                        <div class="modal-icon-wrapper blue-icon">
-                            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-                        </div>
-                        <div class="modal-action-details">
-                            <span class="modal-action-name">Ouvrir optimisé</span>
-                            <span class="modal-action-desc">Utilise le mode plein écran optimisé</span>
-                        </div>
-                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                    </button>
-
-                    <button id="opt-helper-login" class="modal-action-row">
-                        <div class="modal-icon-wrapper orange-icon">
-                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 8c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V8z"/></svg>
-                        </div>
-                        <div class="modal-action-details">
-                            <span class="modal-action-name">Connexion Assistée</span>
-                            <span class="modal-action-desc">Résout les bugs de connexion/popups en plein écran</span>
-                        </div>
-                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                    </button>
-
-                    <button id="opt-copy" class="modal-action-row">
-                        <div class="modal-icon-wrapper gray-icon">
-                            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                        </div>
-                        <div class="modal-action-details">
-                            <span class="modal-action-name">Copier le lien</span>
-                            <span class="modal-action-desc">Copie le lien optimisé dans le presse-papier</span>
-                        </div>
-                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                    </button>
-
-                    <button id="opt-edit" class="modal-action-row">
-                        <div class="modal-icon-wrapper gray-icon">
-                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                        </div>
-                        <div class="modal-action-details">
-                            <span class="modal-action-name">Modifier</span>
-                            <span class="modal-action-desc">Modifier ce favori</span>
-                        </div>
-                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                    </button>
-
-                    <button id="opt-delete" class="modal-action-row text-red">
-                        <div class="modal-icon-wrapper red-icon">
-                            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                        </div>
-                        <div class="modal-action-details">
-                            <span class="modal-action-name">Supprimer</span>
-                            <span class="modal-action-desc">Supprimer ce favori</span>
-                        </div>
-                        <svg class="chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                    </button>
+                <div class="help-item">
+                    <h4>Login button does nothing?</h4>
+                    <p>Some sites use popup windows for authorization which are sandboxed. Use <strong>"Assisted Login"</strong> (long-press a card) to load the login page directly in full screen.</p>
+                </div>
+                <div class="help-item">
+                    <h4>Can't login to Google / YouTube?</h4>
+                    <p>Google blocks embedded browsers. <strong>Workaround:</strong> Open Plex or Spotify in Fullscreen, click <em>Sign in with Google</em>, and log in. Google cookies are shared, so you will be signed in on YouTube automatically!</p>
                 </div>
             </div>
         </div>
-
-        <!-- ========================================== -->
-        <!-- 6. MODE OPTIMISÉ - REDIRECTION -->
-        <!-- ========================================== -->
-        <section id="view-redirect" class="app-view redirect-screen hidden">
-            <div class="redirect-content">
-                <div class="redirect-icon-outer">
-                    <div class="redirect-icon-inner">
-                        <svg class="rocket-icon-pulse" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.248c0 0-4.8 5.76-4.8 11.52a4.8 4.8 0 1 0 9.6 0c0-5.76-4.8-11.52-4.8-11.52zm.4 6.72a1 1 0 0 1-1.4 0 1 1 0 0 1 0-1.4 1.4 1.4 0 0 1 2 0 1.4 1.4 0 0 1 0 2zM12 18.5a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
-                    </div>
-                </div>
-                <h2 class="redirect-title">Ouverture optimisée...</h2>
-                <p class="redirect-subtitle">Redirection en cours</p>
-                
-                <div class="progress-bar-container">
-                    <div id="redirect-progress" class="progress-bar-fill"></div>
-                </div>
-                
-                <p class="redirect-fallback-tip">Si la page ne se charge pas, essayez "Ouvrir Direct".</p>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- 7. AIDE & ASTUCES DE CONNEXION -->
-        <!-- ========================================== -->
-        <section id="view-help" class="app-view hidden">
-            <!-- Header -->
-            <header class="view-header">
-                <div class="header-left">
-                    <button class="back-btn">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                    </button>
-                    <span class="header-title">TESLA LAUNCHER</span>
-                </div>
-                <div class="header-right">
-                    <span class="header-time">16:20</span>
-                </div>
-            </header>
-
-            <!-- Body -->
-            <div class="view-body">
-                <div class="section-title-row">
-                    <h2 class="view-title">Aide & Connexions</h2>
-                </div>
-                
-                <div class="help-content-list">
-                    <div class="help-card">
-                        <div class="help-card-icon-wrapper">
-                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 8c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V8z"/></svg>
-                        </div>
-                        <div class="help-card-text">
-                            <h3>Pourquoi mes connexions ne sont pas partagées ?</h3>
-                            <p>Le système de votre Tesla sépare le navigateur web standard et le conteneur YouTube/Théâtre (Mode Optimisé) dans deux profils Chromium différents. Les cookies et identifiants saisis dans le navigateur standard ne sont pas accessibles en mode Plein Écran (Optimisé). Vous devez vous connecter directement en Mode Optimisé.</p>
-                        </div>
-                    </div>
-
-                    <div class="help-card">
-                        <div class="help-card-icon-wrapper">
-                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-9 14H5v-5h5v5zm0-6H5V7h5v5zm9 6h-7v-5h7v5zm0-6h-7V7h7v5z"/></svg>
-                        </div>
-                        <div class="help-card-text">
-                            <h3>Le bouton Connexion ne fait rien ?</h3>
-                            <p>Certains sites (ex: Canal+) ouvrent leur formulaire de connexion dans une nouvelle fenêtre contextuelle (popup / <code>window.open</code>). Cette action est bloquée par la sandbox du lecteur multimédia Tesla. <br><strong>Solution :</strong> Utilisez l'option <strong>"Connexion Assistée"</strong> dans le menu des options (appui long sur le favori) pour charger la page de connexion directement en plein écran.</p>
-                        </div>
-                    </div>
-
-                    <div class="help-card">
-                        <div class="help-card-icon-wrapper">
-                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.1 13.9c-.2.3-.5.4-.8.2-2.4-1.5-5.5-1.8-9.1-1-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.9-.9 7.4-.5 10.1 1.2.3.1.4.5.1.8zm1.2-2.7c-.3.4-.8.5-1.2.3-2.8-1.7-7-2.2-10.2-1.2-.5.1-1-.1-1.2-.6-.1-.5.1-1 .6-1.2 3.8-1.2 8.5-.6 11.7 1.4.4.2.5.8.3 1.3z"/></svg>
-                        </div>
-                        <div class="help-card-text">
-                            <h3>Impossible de se connecter à Google / YouTube ?</h3>
-                            <p>Google bloque les connexions issues d'applications tierces non reconnues. <br><strong>Astuce :</strong> Ouvrez un favori comme <strong>Plex</strong> ou <strong>Spotify</strong> en Mode Optimisé, cliquez sur <em>Se connecter avec Google</em>, puis effectuez la connexion. Les cookies Google étant partagés, vous serez automatiquement connecté lorsque vous ouvrirez YouTube en plein écran !</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- GLOBAL APP FEATURES FOOTER -->
-        <!-- ========================================== -->
-        <footer class="app-info-footer">
-            <div class="info-block">
-                <svg class="info-icon" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
-                <div class="info-text-group">
-                    <span class="info-block-title">CONÇU POUR TESLA</span>
-                    <span class="info-block-desc">Interface adaptée à l'écran tactile de votre Tesla</span>
-                </div>
-            </div>
-            <div class="info-block">
-                <svg class="info-icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
-                <div class="info-text-group">
-                    <span class="info-block-title">ULTRA RAPIDE</span>
-                    <span class="info-block-desc">100% statique, optimisé pour MCU Intel</span>
-                </div>
-            </div>
-            <div class="info-block">
-                <svg class="info-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-                <div class="info-text-group">
-                    <span class="info-block-title">100% PRIVÉ</span>
-                    <span class="info-block-desc">Aucune donnée envoyée, tout est local</span>
-                </div>
-            </div>
-            <div class="info-block">
-                <svg class="info-icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                <div class="info-text-group">
-                    <span class="info-block-title">SIMPLE & EFFICACE</span>
-                    <span class="info-block-desc">Lancez vos contenus en un seul geste</span>
-                </div>
-            </div>
-        </footer>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- SETTINGS MODAL -->
     <div id="modal-settings" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="modal-title">Paramètres</span>
-                <button class="modal-close">&times;</button>
+                <span class="modal-title">Settings</span>
+                <button class="modal-close" id="btn-close-settings">&times;</button>
             </div>
-            <div class="modal-actions-list">
-                <!-- Vibration Toggle -->
-                <div class="modal-action-row">
-                    <div class="modal-icon-wrapper blue-icon">
-                        <svg viewBox="0 0 24 24"><path d="M6.5 6.5c0-1.77 1.43-3.2 3.2-3.2h3v2H9.7c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63h2.2v2H9.7c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63h2.2v2H9.7c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63h3c1.77 0 3.2-1.43 3.2-3.2v-3h2v3c0 1.77-1.43 3.2-3.2 3.2h-3v-2h3.2c.9 0 1.63-.73 1.63-1.63s-.73-1.63-1.63-1.63h-2.2v-2h2.2c.9 0 1.63-.73 1.63-1.63s-.73-1.63-1.63-1.63h-3v-2z"/></svg>
+            <div class="modal-body">
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <span class="settings-name">Haptic Feedback</span>
+                        <span class="settings-desc">Vibrate on touch interactions</span>
                     </div>
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">Retour haptique</span>
-                        <span class="modal-action-desc">Active la vibration lors des actions réussies</span>
+                    <label class="switch">
+                        <input type="checkbox" id="vibration-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <span class="settings-name">Long Press Duration</span>
+                        <span class="settings-desc">Time required to trigger options</span>
                     </div>
-                    <div class="modal-action-details">
-                        <label class="switch">
-                            <input type="checkbox" id="vibration-toggle">
-                            <span class="slider round"></span>
-                        </label>
+                    <div class="slider-container">
+                        <input type="range" min="500" max="2000" value="1000" step="100" id="long-press-slider">
+                        <span id="long-press-value">1000ms</span>
                     </div>
                 </div>
-
-                <!-- Long Press Sensitivity -->
-                <div class="modal-action-row">
-                    <div class="modal-icon-wrapper blue-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <div class="settings-row">
+                    <div class="settings-info">
+                        <span class="settings-name">Time Format</span>
+                        <span class="settings-desc">Show time in 12h or 24h format</span>
                     </div>
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">Sensibilité du maintien appuyé</span>
-                        <span class="modal-action-desc">Ajuster le temps nécessaire pour considérer un maintien appuyé</span>
-                    </div>
-                    <div class="modal-action-details">
-                        <div class="slider-container">
-                            <input type="range" min="500" max="2000" value="1000" step="100" id="long-press-slider">
-                            <span id="long-press-value">1000ms</span>
-                        </div>
+                    <div class="segmented-control" id="time-format-control">
+                        <button type="button" class="segment-btn active" data-value="24h">24h</button>
+                        <button type="button" class="segment-btn" data-value="12h">12h</button>
                     </div>
                 </div>
-
-                <!-- Time Format -->
-                <div class="modal-action-row">
-                    <div class="modal-icon-wrapper blue-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 4.5L15.55 9l1.36-1.36L18 12l-3.91 3.91-1.36-1.36L12 16.5l-3.55 3.55-1.36 1.36L6 12l3.91-3.91z"/></svg>
-                    </div>
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">Format de l'heure</span>
-                        <span class="modal-action-desc">Choisir entre l'affichage 12h ou 24h</span>
-                    </div>
-                    <div class="modal-action-details">
-                        <div class="toggle-group">
-                            <label class="toggle-label">24h</label>
-                            <input type="checkbox" id="time-format-toggle">
-                            <label class="toggle-label">12h</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reset to Defaults -->
-                <div class="modal-action-row text-red">
-                    <div class="modal-icon-wrapper red-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14c-2.33 0-4.31-1.56-5.11-3.77l-.95 2.26c1.18 1.32 2.88 2.15 4.8 2.15s3.62-.83 4.8-2.15l-.95-2.26c-.8-2.21-2.78-3.77-5.11-3.77zM12 14c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
-                    </div>
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">Réinitialiser les paramètres</span>
-                        <span class="modal-action-desc">Restaurer toutes les valeurs par défaut</span>
-                    </div>
+                <div class="settings-row" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                    <button id="btn-reset-settings" class="btn-modal-danger">RESET SETTINGS</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Script File -->
+    <!-- Scripts -->
     <script src="app.js"></script>
 </body>
 </html>

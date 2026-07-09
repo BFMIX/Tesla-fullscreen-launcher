@@ -25,3 +25,20 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Agentic AI and Antigravity directories
+.gemini/
+.agents/
+task.md
+implementation_plan.md
+walkthrough.md
+walkthrough_v2.md
+walkthrough_v3.md
+walkthrough_v4.md
+walkthrough_v5.md
+walkthrough_v6.md
+walkthrough_v7.md
+walkthrough_v8.md
+walkthrough_v9.md
+walkthrough_v10.md
+
