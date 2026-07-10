@@ -4,19 +4,28 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Favicon fetch cache to avoid repeated requests for the same URL during a session
-    const faviconFetchCache = new Set();
-
-    // Default configuration for initial launcher favorites
+    // Default configuration for initial launcher favorites (v4)
     const DEFAULT_FAVORITES = [
-        { id: 'fav-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://tv.apple.com', launchMode: 'optimized' },
-        { id: 'fav-disney', name: 'Disney+', url: 'https://www.disneyplus.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://www.disneyplus.com', launchMode: 'optimized' },
-        { id: 'fav-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'plex', lastContext: 'Direct launch', lastUrl: 'https://app.plex.tv/desktop', launchMode: 'optimized' },
-        { id: 'fav-canal', name: 'Canal+', url: 'https://www.canalplus.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://www.canalplus.com', launchMode: 'optimized' }
+        { id: 'fav-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://tv.apple.com', launchMode: 'optimized', lastOpened: 0 },
+        { id: 'fav-disney', name: 'Disney+', url: 'https://www.disneyplus.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://www.disneyplus.com', launchMode: 'optimized', lastOpened: 0 },
+        { id: 'fav-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'plex', lastContext: 'Direct launch', lastUrl: 'https://app.plex.tv/desktop', launchMode: 'optimized', lastOpened: 0 },
+        { id: 'fav-canal', name: 'Canal+', url: 'https://www.canalplus.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://www.canalplus.com', launchMode: 'optimized', lastOpened: 0 }
     ];
 
-    let selectedFavorite = null;
-    let editMode = false;
+    // Default configuration for initial quick apps
+    const DEFAULT_QUICK_APPS = [
+        { id: 'qa-youtube', name: 'YouTube', url: 'https://www.youtube.com', icon: 'youtube', lastOpened: 0 },
+        { id: 'qa-twitch', name: 'Twitch', url: 'https://www.twitch.tv', icon: 'twitch', lastOpened: 0 },
+        { id: 'qa-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'plex', lastOpened: 0 },
+        { id: 'qa-jellyfin', name: 'Jellyfin', url: 'https://jellyfin.org', icon: 'globe', lastOpened: 0 }
+    ];
+
+    let selectedItem = null;
+    let selectedIsQuickApp = false;
+    let selectedIsRecent = false;
+    
+    let editModeFavorites = false;
+    let editModeQuickApps = false;
 
     // Settings defaults
     const defaultSettings = {
@@ -101,6 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // ==========================================================================
     // Smart Memory State Engine
     // ==========================================================================
@@ -111,14 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const urlObj = new URL(normalized);
             const host = urlObj.hostname.toLowerCase();
             
+            // Check favorites first
             let favs = getFavorites();
-            let updated = false;
+            let favUpdated = false;
 
             favs.forEach(fav => {
                 const favHost = new URL(normalizeUrl(fav.url)).hostname.toLowerCase();
                 if (host === favHost || host.endsWith('.' + favHost) || favHost.endsWith('.' + host)) {
-                    // Match found! Save sub-path context
                     fav.lastUrl = normalized;
+                    fav.lastOpened = Date.now(); // update opened timestamp for sorting
                     
                     if (host.includes('twitch.tv')) {
                         const channel = urlObj.pathname.split('/').filter(Boolean)[0];
@@ -142,17 +162,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (path.length > 20) path = path.substring(0, 17) + '...';
                         fav.lastContext = path !== '/' ? `Last: ${path}` : 'Last launched';
                     }
-                    updated = true;
+                    favUpdated = true;
                 }
             });
 
-            if (updated) {
+            if (favUpdated) {
                 localStorage.setItem('tesla_launcher_favs_v4', JSON.stringify(favs));
                 renderFavorites();
-            } else {
-                // If it's a custom URL that didn't match any pinned favorite, save to Recents
-                addRecentLaunch(normalized);
+                return;
             }
+
+            // Check Quick Apps next
+            let apps = getQuickApps();
+            let appUpdated = false;
+
+            apps.forEach(app => {
+                const appHost = new URL(normalizeUrl(app.url)).hostname.toLowerCase();
+                if (host === appHost || host.endsWith('.' + appHost) || appHost.endsWith('.' + host)) {
+                    app.lastOpened = Date.now(); // bump timestamp
+                    appUpdated = true;
+                }
+            });
+
+            if (appUpdated) {
+                localStorage.setItem('tesla_launcher_quick_apps_v4', JSON.stringify(apps));
+                renderQuickApps();
+                return;
+            }
+
+            // Otherwise, add to Recents (which will also sort them dynamically)
+            addRecentLaunch(normalized);
         } catch (e) {
             console.error("Error updating smart card context", e);
         }
@@ -174,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const normalized = normalizeUrl(url);
         
-        // Update context memory
+        // Update context memory and dynamic sorting timestamps
         updateSmartCardContext(normalized);
 
         const target = (mode === 'optimized') ? getOptimizedUrl(normalized) : normalized;
@@ -220,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // LocalStorage Data Controllers
     // ==========================================================================
 
+    // --- Favorites ---
     function getFavorites() {
         const favsKeyV4 = 'tesla_launcher_favs_v4';
         const favs = localStorage.getItem(favsKeyV4);
@@ -251,10 +291,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         return userHost === defHost;
                     });
                     if (!alreadyExists) {
-                        mergedFavs.push(userFav);
+                        mergedFavs.push({
+                            ...userFav,
+                            lastOpened: userFav.lastOpened || 0
+                        });
                     }
                 } catch (e) {
-                    mergedFavs.push(userFav);
+                    mergedFavs.push({
+                        ...userFav,
+                        lastOpened: 0
+                    });
                 }
             });
 
@@ -271,6 +317,24 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFavorites();
     }
 
+    // --- Quick Apps ---
+    function getQuickApps() {
+        const appsKeyV4 = 'tesla_launcher_quick_apps_v4';
+        const apps = localStorage.getItem(appsKeyV4);
+        if (apps) {
+            return JSON.parse(apps);
+        }
+        
+        localStorage.setItem(appsKeyV4, JSON.stringify(DEFAULT_QUICK_APPS));
+        return DEFAULT_QUICK_APPS;
+    }
+
+    function saveQuickApps(apps) {
+        localStorage.setItem('tesla_launcher_quick_apps_v4', JSON.stringify(apps));
+        renderQuickApps();
+    }
+
+    // --- Recents ---
     function getRecentLaunches() {
         const recents = localStorage.getItem('tesla_launcher_recent_launches_v3');
         return recents ? JSON.parse(recents) : [];
@@ -278,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addRecentLaunch(url) {
         let recents = getRecentLaunches();
-        // Remove duplicate if it exists
         recents = recents.filter(item => item.url !== url);
         
         recents.unshift({
@@ -288,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
             timestamp: Date.now()
         });
 
-        // Limit to 5 recent items
         if (recents.length > 5) recents = recents.slice(0, 5);
         localStorage.setItem('tesla_launcher_recent_launches_v3', JSON.stringify(recents));
         renderFavorites();
@@ -302,9 +364,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // UI Render Engine (Smart Cards horizontal carousel)
+    // UI Render Engine
     // ==========================================================================
 
+    // --- Favorites & Recents Dynamic Sorting Render ---
     function renderFavorites() {
         const carousel = document.getElementById('favorites-carousel');
         if (!carousel) return;
@@ -313,16 +376,56 @@ document.addEventListener('DOMContentLoaded', () => {
         const favs = getFavorites();
         const recents = getRecentLaunches();
 
-        // 1. Draw Pinned Smart Cards
-        favs.forEach(fav => {
+        // Standardize schemas for sorting:
+        const normalizedFavs = favs.map(f => ({
+            ...f,
+            isRecent: false,
+            sortTime: f.lastOpened || 0
+        }));
+
+        const normalizedRecents = recents.map(r => ({
+            id: r.id,
+            name: r.name,
+            url: r.url,
+            lastUrl: r.url,
+            icon: 'globe',
+            launchMode: 'optimized',
+            isRecent: true,
+            sortTime: r.timestamp || 0
+        }));
+
+        // Combine Pinned Favorites and Recents
+        const combined = [...normalizedFavs, ...normalizedRecents];
+
+        // Sort by lastOpened / timestamp descending (dynamic ordering)
+        combined.sort((a, b) => {
+            const timeA = a.sortTime;
+            const timeB = b.sortTime;
+            if (timeB !== timeA) {
+                return timeB - timeA;
+            }
+            // If they are equal (e.g. both 0), sort Favorites first, then Recents, then alphabetically
+            if (a.isRecent && !b.isRecent) return 1;
+            if (!a.isRecent && b.isRecent) return -1;
+            return a.name.localeCompare(b.name);
+        });
+
+        // Draw dynamically sorted cards
+        combined.forEach(item => {
             const card = document.createElement('div');
             card.className = 'smart-card';
             
-            const contextText = fav.lastContext || 'Direct launch';
+            let contextText = item.lastContext;
+            if (item.isRecent) {
+                const timeStr = new Date(item.sortTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                contextText = `Recent launch • ${timeStr}`;
+            } else if (!contextText) {
+                contextText = 'Direct launch';
+            }
             
             let faviconUrl = 'asset/icon.png';
             try {
-                const hostname = new URL(fav.url).hostname;
+                const hostname = new URL(item.url).hostname;
                 faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
             } catch (e) {}
             
@@ -330,87 +433,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="card-delete-badge" title="Delete">&times;</button>
                 <div class="smart-card-header">
                     <div class="smart-card-brand">
-                        <img class="smart-card-icon" src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(fav.name)}">
-                        <span class="smart-card-title">${escapeHtml(fav.name)}</span>
+                        <img class="smart-card-icon" src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(item.name)}">
+                        <span class="smart-card-title">${escapeHtml(item.name)}</span>
                     </div>
                 </div>
                 <div class="smart-card-body">
                     <span class="smart-card-context">${escapeHtml(contextText)}</span>
                 </div>
                 <div class="smart-card-footer">
-                    <button class="smart-card-launch-btn">▶ Open</button>
+                    <button class="smart-card-launch-btn" ${item.isRecent ? 'style="color: #9AA0A6;"' : ''}>▶ Open</button>
                 </div>
             `;
 
-            // Delete badge actions in edit mode
+            // Delete badge triggers in edit mode
             const delBtn = card.querySelector('.card-delete-badge');
-            if (editMode) delBtn.style.display = 'flex';
+            if (editModeFavorites) delBtn.style.display = 'flex';
             
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (confirm(`Are you sure you want to delete ${fav.name}?`)) {
-                    let updatedFavs = getFavorites().filter(f => f.id !== fav.id);
-                    saveFavorites(updatedFavs);
+                if (item.isRecent) {
+                    deleteRecentLaunch(item.id);
+                } else {
+                    if (confirm(`Are you sure you want to delete ${item.name}?`)) {
+                        let updatedFavs = getFavorites().filter(f => f.id !== item.id);
+                        saveFavorites(updatedFavs);
+                    }
                 }
             });
 
-            // Card click & hold behavior
-            setupCardInteraction(card, fav, false);
+            setupCardInteraction(card, item, item.isRecent, false);
             carousel.appendChild(card);
         });
 
-        // 2. Draw Recent Launches
-        recents.forEach(recent => {
-            const card = document.createElement('div');
-            card.className = 'smart-card';
-            
-            // Format time difference
-            const timeStr = new Date(recent.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            let faviconUrl = 'asset/icon.png';
-            try {
-                const hostname = new URL(recent.url).hostname;
-                faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
-            } catch (e) {}
-            
-            card.innerHTML = `
-                <button class="card-delete-badge" title="Remove">&times;</button>
-                <div class="smart-card-header">
-                    <div class="smart-card-brand">
-                        <img class="smart-card-icon" src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(recent.name)}">
-                        <span class="smart-card-title">${escapeHtml(recent.name)}</span>
-                    </div>
-                </div>
-                <div class="smart-card-body">
-                    <span class="smart-card-context">Recent launch • ${timeStr}</span>
-                </div>
-                <div class="smart-card-footer">
-                    <button class="smart-card-launch-btn" style="color: #9AA0A6;">▶ Launch</button>
-                </div>
-            `;
-
-            const delBtn = card.querySelector('.card-delete-badge');
-            if (editMode) delBtn.style.display = 'flex';
-            
-            delBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteRecentLaunch(recent.id);
-            });
-
-            // Set up click/options for recent launch item
-            setupCardInteraction(card, {
-                id: recent.id,
-                name: recent.name,
-                url: recent.url,
-                lastUrl: recent.url,
-                launchMode: 'optimized',
-                icon: 'globe'
-            }, true);
-            
-            carousel.appendChild(card);
-        });
-
-        // 3. Append the [+] Smart Card Add-Button
+        // Add Pinned card Add-Button at the end of the carousel
         const addCard = document.createElement('div');
         addCard.className = 'smart-card add-favorite-card';
         addCard.innerHTML = `
@@ -420,18 +475,84 @@ document.addEventListener('DOMContentLoaded', () => {
         
         addCard.addEventListener('click', () => {
             triggerHapticFeedback();
-            // Prefill with input value if there is any
             document.getElementById('fav-url-input').value = document.getElementById('url-input').value;
             document.getElementById('fav-label-input').value = '';
             document.getElementById('fav-modal-title').textContent = 'Add to Favorites';
+            selectedIsQuickApp = false;
+            selectedItem = null;
             openModal('modal-add-favorite');
         });
 
         carousel.appendChild(addCard);
     }
 
+    // --- Quick Apps Dynamic Render ---
+    function renderQuickApps() {
+        const grid = document.getElementById('quick-apps-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const apps = getQuickApps();
+
+        apps.forEach(app => {
+            const btn = document.createElement('button');
+            btn.className = 'quick-app-btn';
+            btn.setAttribute('data-id', app.id);
+            
+            let faviconUrl = 'asset/icon.png';
+            try {
+                const hostname = new URL(app.url).hostname;
+                faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+            } catch (e) {}
+
+            btn.innerHTML = `
+                <button class="card-delete-badge" title="Delete">&times;</button>
+                <img src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(app.name)}">
+                <span>${escapeHtml(app.name)}</span>
+            `;
+
+            // Delete badge triggers in edit mode
+            const delBtn = btn.querySelector('.card-delete-badge');
+            if (editModeQuickApps) delBtn.style.display = 'flex';
+            
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Remove Quick App ${app.name}?`)) {
+                    let updatedApps = getQuickApps().filter(a => a.id !== app.id);
+                    saveQuickApps(updatedApps);
+                }
+            });
+
+            setupCardInteraction(btn, app, false, true);
+            grid.appendChild(btn);
+        });
+
+        // If in edit mode, append the Add button to the grid
+        if (editModeQuickApps) {
+            const addBtn = document.createElement('button');
+            addBtn.className = 'quick-app-btn';
+            addBtn.style.borderStyle = 'dashed';
+            addBtn.style.borderColor = 'var(--text-dark)';
+            addBtn.innerHTML = `
+                <span style="font-size: 20px; font-weight: bold; color: var(--text-muted);">+</span>
+                <span style="color: var(--text-muted);">Add App</span>
+            `;
+            
+            addBtn.addEventListener('click', () => {
+                triggerHapticFeedback();
+                document.getElementById('fav-url-input').value = document.getElementById('url-input').value;
+                document.getElementById('fav-label-input').value = '';
+                document.getElementById('fav-modal-title').textContent = 'Add to Quick Apps';
+                selectedIsQuickApp = true;
+                selectedItem = null;
+                openModal('modal-add-favorite');
+            });
+            grid.appendChild(addBtn);
+        }
+    }
+
     // Handles tap vs long press for tactile comfort
-    function setupCardInteraction(element, favorite, isRecent = false) {
+    function setupCardInteraction(element, item, isRecent, isQuickApp) {
         let pressTimer = null;
         let isLongPress = false;
         let isScrolling = false;
@@ -443,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pressTimer = setTimeout(() => {
                 isLongPress = true;
                 triggerHapticFeedback();
-                openOptionsModal(favorite, isRecent);
+                openOptionsModal(item, isRecent, isQuickApp);
             }, settings.longPressDuration);
         };
 
@@ -459,9 +580,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!isLongPress) {
                 triggerHapticFeedback();
-                // Launch last context if available, otherwise base URL
-                const targetUrl = favorite.lastUrl || favorite.url;
-                launch(targetUrl, favorite.launchMode || 'optimized');
+                // Launch last URL context if saved, otherwise default url
+                const targetUrl = item.lastUrl || item.url;
+                launch(targetUrl, item.launchMode || 'optimized');
             }
         };
 
@@ -522,18 +643,28 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('modal-settings');
     });
 
-    // Edit Favorites Mode Button
+    // Edit Favorites Button
     const btnEditFavs = document.getElementById('btn-edit-favorites');
     btnEditFavs.addEventListener('click', () => {
         triggerHapticFeedback();
-        editMode = !editMode;
-        btnEditFavs.classList.toggle('active', editMode);
-        btnEditFavs.textContent = editMode ? 'Done' : 'Edit';
+        editModeFavorites = !editModeFavorites;
+        btnEditFavs.classList.toggle('active', editModeFavorites);
+        btnEditFavs.textContent = editModeFavorites ? 'Done' : 'Edit';
         renderFavorites();
     });
 
+    // Edit Quick Apps Button
+    const btnEditQuickApps = document.getElementById('btn-edit-quick-apps');
+    btnEditQuickApps.addEventListener('click', () => {
+        triggerHapticFeedback();
+        editModeQuickApps = !editModeQuickApps;
+        btnEditQuickApps.classList.toggle('active', editModeQuickApps);
+        btnEditQuickApps.textContent = editModeQuickApps ? 'Done' : 'Edit';
+        renderQuickApps();
+    });
+
     // ==========================================================================
-    // Favorite Modification Overlay Setup
+    // Favorite / Quick App Modification Save Overlay
     // ==========================================================================
 
     let selectedFormIcon = 'youtube';
@@ -564,92 +695,149 @@ document.addEventListener('DOMContentLoaded', () => {
         const cleanUrl = normalizeUrl(url);
         const cleanName = name || cleanUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
         
-        let favs = getFavorites();
-
-        if (selectedFavorite && selectedFavorite.id && !selectedFavorite.id.startsWith('recent-')) {
-            // Edit existing pinned card
-            favs = favs.map(f => {
-                if (f.id === selectedFavorite.id) {
-                    return {
-                        ...f,
-                        name: cleanName,
-                        url: cleanUrl,
-                        icon: selectedFormIcon,
-                        lastUrl: cleanUrl,
-                        lastContext: 'Edited URL'
-                    };
-                }
-                return f;
-            });
+        if (selectedIsQuickApp) {
+            let apps = getQuickApps();
+            if (selectedItem && selectedItem.id) {
+                // Edit existing app
+                apps = apps.map(a => {
+                    if (a.id === selectedItem.id) {
+                        return { ...a, name: cleanName, url: cleanUrl, icon: selectedFormIcon };
+                    }
+                    return a;
+                });
+            } else {
+                // Add new app
+                apps.push({
+                    id: 'qa-' + Date.now(),
+                    name: cleanName,
+                    url: cleanUrl,
+                    icon: selectedFormIcon,
+                    lastOpened: 0
+                });
+            }
+            saveQuickApps(apps);
         } else {
-            // Create a brand new pinned card
-            favs.push({
-                id: 'fav-' + Date.now(),
-                name: cleanName,
-                url: cleanUrl,
-                icon: selectedFormIcon,
-                lastUrl: cleanUrl,
-                lastContext: 'Direct launch',
-                launchMode: 'optimized'
-            });
+            let favs = getFavorites();
+            if (selectedItem && selectedItem.id && !selectedIsRecent) {
+                // Edit existing favorite
+                favs = favs.map(f => {
+                    if (f.id === selectedItem.id) {
+                        return {
+                            ...f,
+                            name: cleanName,
+                            url: cleanUrl,
+                            icon: selectedFormIcon,
+                            lastUrl: cleanUrl,
+                            lastContext: 'Edited URL'
+                        };
+                    }
+                    return f;
+                });
+            } else {
+                // Add new favorite
+                favs.push({
+                    id: 'fav-' + Date.now(),
+                    name: cleanName,
+                    url: cleanUrl,
+                    icon: selectedFormIcon,
+                    lastUrl: cleanUrl,
+                    lastContext: 'Direct launch',
+                    launchMode: 'optimized',
+                    lastOpened: 0
+                });
+            }
+            saveFavorites(favs);
         }
 
-        saveFavorites(favs);
         closeModal('modal-add-favorite');
-        selectedFavorite = null;
+        selectedItem = null;
     });
 
     // ==========================================================================
     // Options Overlay Actions Controller
     // ==========================================================================
 
-    function openOptionsModal(favorite, isRecent = false) {
-        selectedFavorite = favorite;
+    function openOptionsModal(item, isRecent = false, isQuickApp = false) {
+        selectedItem = item;
+        selectedIsQuickApp = isQuickApp;
+        selectedIsRecent = isRecent;
+        
         openModal('modal-options');
 
-        // Hide edit/delete options in popup for standard unsaved recents
         const optEdit = document.getElementById('opt-edit');
         const optDelete = document.getElementById('opt-delete');
-        if (isRecent) {
-            optEdit.style.display = 'none';
-            optDelete.textContent = 'Remove from Recents';
-        } else {
+        const optMoveLeft = document.getElementById('opt-move-left');
+        const optMoveRight = document.getElementById('opt-move-right');
+        
+        // Hide reordering elements for dynamically sorted favorites & recents
+        if (isQuickApp) {
+            optMoveLeft.style.display = 'flex';
+            optMoveRight.style.display = 'flex';
             optEdit.style.display = 'flex';
-            optDelete.textContent = 'Delete Favorite';
+            optDelete.textContent = 'Remove Quick App';
+            
+            // Check boundary positions to disable moving out of bounds
+            const apps = getQuickApps();
+            const idx = apps.findIndex(a => a.id === item.id);
+            if (idx <= 0) {
+                optMoveLeft.style.opacity = '0.3';
+                optMoveLeft.style.pointerEvents = 'none';
+            } else {
+                optMoveLeft.style.opacity = '1';
+                optMoveLeft.style.pointerEvents = 'auto';
+            }
+            if (idx === -1 || idx >= apps.length - 1) {
+                optMoveRight.style.opacity = '0.3';
+                optMoveRight.style.pointerEvents = 'none';
+            } else {
+                optMoveRight.style.opacity = '1';
+                optMoveRight.style.pointerEvents = 'auto';
+            }
+        } else {
+            optMoveLeft.style.display = 'none';
+            optMoveRight.style.display = 'none';
+            
+            if (isRecent) {
+                optEdit.style.display = 'none';
+                optDelete.textContent = 'Remove from Recents';
+            } else {
+                optEdit.style.display = 'flex';
+                optDelete.textContent = 'Delete Favorite';
+            }
         }
     }
 
     document.getElementById('opt-direct').addEventListener('click', () => {
-        if (selectedFavorite) {
+        if (selectedItem) {
             triggerHapticFeedback();
-            const targetUrl = selectedFavorite.lastUrl || selectedFavorite.url;
+            const targetUrl = selectedItem.lastUrl || selectedItem.url;
             launch(targetUrl, 'direct');
             closeModal('modal-options');
         }
     });
 
     document.getElementById('opt-optimized').addEventListener('click', () => {
-        if (selectedFavorite) {
+        if (selectedItem) {
             triggerHapticFeedback();
-            const targetUrl = selectedFavorite.lastUrl || selectedFavorite.url;
+            const targetUrl = selectedItem.lastUrl || selectedItem.url;
             launch(targetUrl, 'optimized');
             closeModal('modal-options');
         }
     });
 
     document.getElementById('opt-helper-login').addEventListener('click', () => {
-        if (selectedFavorite) {
+        if (selectedItem) {
             triggerHapticFeedback();
-            const helperUrl = getHelperLoginUrl(selectedFavorite.url);
+            const helperUrl = getHelperLoginUrl(selectedItem.url);
             launch(helperUrl, 'optimized');
             closeModal('modal-options');
         }
     });
 
     document.getElementById('opt-copy').addEventListener('click', () => {
-        if (selectedFavorite) {
+        if (selectedItem) {
             triggerHapticFeedback();
-            const targetUrl = getOptimizedUrl(selectedFavorite.lastUrl || selectedFavorite.url);
+            const targetUrl = getOptimizedUrl(selectedItem.lastUrl || selectedItem.url);
             navigator.clipboard.writeText(targetUrl).then(() => {
                 const textEl = document.getElementById('opt-copy').querySelector('.modal-action-name');
                 const originalText = textEl.textContent;
@@ -664,34 +852,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Reorder Shift Left
+    document.getElementById('opt-move-left').addEventListener('click', () => {
+        if (selectedItem && selectedIsQuickApp) {
+            triggerHapticFeedback();
+            let apps = getQuickApps();
+            const idx = apps.findIndex(a => a.id === selectedItem.id);
+            if (idx > 0) {
+                // Swap position
+                const temp = apps[idx];
+                apps[idx] = apps[idx - 1];
+                apps[idx - 1] = temp;
+                saveQuickApps(apps);
+            }
+            closeModal('modal-options');
+        }
+    });
+
+    // Reorder Shift Right
+    document.getElementById('opt-move-right').addEventListener('click', () => {
+        if (selectedItem && selectedIsQuickApp) {
+            triggerHapticFeedback();
+            let apps = getQuickApps();
+            const idx = apps.findIndex(a => a.id === selectedItem.id);
+            if (idx !== -1 && idx < apps.length - 1) {
+                // Swap position
+                const temp = apps[idx];
+                apps[idx] = apps[idx + 1];
+                apps[idx + 1] = temp;
+                saveQuickApps(apps);
+            }
+            closeModal('modal-options');
+        }
+    });
+
     document.getElementById('opt-edit').addEventListener('click', () => {
-        if (selectedFavorite) {
+        if (selectedItem) {
             triggerHapticFeedback();
             closeModal('modal-options');
             
-            document.getElementById('fav-url-input').value = selectedFavorite.url;
-            document.getElementById('fav-label-input').value = selectedFavorite.name;
-            document.getElementById('fav-modal-title').textContent = 'Edit Favorite';
+            document.getElementById('fav-url-input').value = selectedItem.url;
+            document.getElementById('fav-label-input').value = selectedItem.name;
+            document.getElementById('fav-modal-title').textContent = selectedIsQuickApp ? 'Edit Quick App' : 'Edit Favorite';
             
             formIconItems.forEach(item => {
-                item.classList.toggle('active', item.getAttribute('data-icon') === selectedFavorite.icon);
+                item.classList.toggle('active', item.getAttribute('data-icon') === selectedItem.icon);
             });
-            selectedFormIcon = selectedFavorite.icon;
+            selectedFormIcon = selectedItem.icon;
             
             openModal('modal-add-favorite');
         }
     });
 
     document.getElementById('opt-delete').addEventListener('click', () => {
-        if (selectedFavorite) {
+        if (selectedItem) {
             triggerHapticFeedback();
             closeModal('modal-options');
             
-            if (selectedFavorite.id.startsWith('recent-')) {
-                deleteRecentLaunch(selectedFavorite.id);
+            if (selectedIsRecent) {
+                deleteRecentLaunch(selectedItem.id);
+            } else if (selectedIsQuickApp) {
+                if (confirm(`Remove Quick App ${selectedItem.name}?`)) {
+                    let updatedApps = getQuickApps().filter(a => a.id !== selectedItem.id);
+                    saveQuickApps(updatedApps);
+                }
             } else {
-                if (confirm(`Delete ${selectedFavorite.name} ?`)) {
-                    let updatedFavs = getFavorites().filter(f => f.id !== selectedFavorite.id);
+                if (confirm(`Delete Favorite ${selectedItem.name}?`)) {
+                    let updatedFavs = getFavorites().filter(f => f.id !== selectedItem.id);
                     saveFavorites(updatedFavs);
                 }
             }
@@ -754,42 +981,6 @@ document.addEventListener('DOMContentLoaded', () => {
             launch(urlInput.value, 'optimized');
         }
     });
-
-    // Quick Apps click handling
-    document.querySelectorAll('.quick-app-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            triggerHapticFeedback();
-            const appType = btn.getAttribute('data-app');
-            
-            // Search pinned favorites for a match to pull its lastContext URL
-            const favs = getFavorites();
-            const matchingFav = favs.find(f => f.icon === appType || f.name.toLowerCase().includes(appType));
-            
-            if (matchingFav) {
-                launch(matchingFav.lastUrl || matchingFav.url, 'optimized');
-            } else {
-                // Fallback direct launching URLs
-                let targetUrl = '';
-                if (appType === 'youtube') targetUrl = 'https://www.youtube.com';
-                else if (appType === 'twitch') targetUrl = 'https://www.twitch.tv';
-                else if (appType === 'plex') targetUrl = 'https://app.plex.tv/desktop';
-                else if (appType === 'jellyfin') targetUrl = 'https://jellyfin.org'; // generic default
-
-                if (targetUrl) launch(targetUrl, 'optimized');
-            }
-        });
-    });
-
-    // Helper HTML Escape
-    function escapeHtml(str) {
-        if (typeof str !== 'string') return '';
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
 
     // ==========================================================================
     // System Settings Controller
@@ -885,6 +1076,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applySettings();
     setInterval(updateClockDisplay, 10000);
     renderFavorites();
+    renderQuickApps();
     updateClearButtonState();
 
 });

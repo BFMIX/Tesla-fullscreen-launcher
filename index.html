@@ -62,24 +62,10 @@
             <section class="quick-apps-section">
                 <div class="section-header">
                     <span class="section-title">Quick Apps</span>
+                    <button id="btn-edit-quick-apps" class="edit-favorites-btn">Edit</button>
                 </div>
-                <div class="quick-apps-grid">
-                    <button class="quick-app-btn" data-app="youtube">
-                        <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" onerror="this.src='asset/icon.png'" alt="YouTube">
-                        <span>YouTube</span>
-                    </button>
-                    <button class="quick-app-btn" data-app="twitch">
-                        <img src="https://www.google.com/s2/favicons?domain=twitch.tv&sz=64" onerror="this.src='asset/icon.png'" alt="Twitch">
-                        <span>Twitch</span>
-                    </button>
-                    <button class="quick-app-btn" data-app="plex">
-                        <img src="https://www.google.com/s2/favicons?domain=plex.tv&sz=64" onerror="this.src='asset/icon.png'" alt="Plex">
-                        <span>Plex</span>
-                    </button>
-                    <button class="quick-app-btn" data-app="jellyfin">
-                        <img src="https://www.google.com/s2/favicons?domain=jellyfin.org&sz=64" onerror="this.src='asset/icon.png'" alt="Jellyfin">
-                        <span>Jellyfin</span>
-                    </button>
+                <div id="quick-apps-grid" class="quick-apps-grid">
+                    <!-- Dynamic Quick Apps Populated by JS -->
                 </div>
             </section>
 
@@ -114,7 +100,7 @@
     </div>
 
     <!-- MODALS OVERLAYS -->
-    <!-- ADD/EDIT FAVORITE MODAL -->
+    <!-- ADD/EDIT FAVORITE / QUICK APP MODAL -->
     <div id="modal-add-favorite" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -139,7 +125,7 @@
                         <button class="selector-icon-item" data-icon="globe">Web</button>
                     </div>
                 </div>
-                <button id="btn-save-favorite" class="btn-modal-primary">SAVE FAVORITE</button>
+                <button id="btn-save-favorite" class="btn-modal-primary">SAVE</button>
             </div>
         </div>
     </div>
@@ -176,16 +162,28 @@
                         <span class="modal-action-desc">Copy optimized fullscreen URL</span>
                     </div>
                 </button>
+                <button id="opt-move-left" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Move Left</span>
+                        <span class="modal-action-desc">Shift this item earlier in the list</span>
+                    </div>
+                </button>
+                <button id="opt-move-right" class="modal-action-row">
+                    <div class="modal-action-details">
+                        <span class="modal-action-name">Move Right</span>
+                        <span class="modal-action-desc">Shift this item later in the list</span>
+                    </div>
+                </button>
                 <button id="opt-edit" class="modal-action-row">
                     <div class="modal-action-details">
-                        <span class="modal-action-name">Edit favorite</span>
+                        <span class="modal-action-name">Edit</span>
                         <span class="modal-action-desc">Modify title, URL, or icon</span>
                     </div>
                 </button>
                 <button id="opt-delete" class="modal-action-row text-red">
                     <div class="modal-action-details">
                         <span class="modal-action-name">Delete</span>
-                        <span class="modal-action-desc">Remove from favorites</span>
+                        <span class="modal-action-desc">Remove from launcher</span>
                     </div>
                 </button>
             </div>
