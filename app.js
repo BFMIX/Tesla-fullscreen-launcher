@@ -452,10 +452,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="smart-card-title">${escapeHtml(item.name)}</span>
                     </div>
                 </div>
-                <div class="smart-card-body">
+                <div class="smart-card-meta-row">
                     <span class="smart-card-context">${escapeHtml(contextText)}</span>
-                </div>
-                <div class="smart-card-footer">
                     <button class="smart-card-launch-btn" ${item.isRecent ? 'style="color: #9AA0A6;"' : ''}>▶ Open</button>
                 </div>
             `;
@@ -652,10 +650,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Close on backdrop touch
+    // Close on backdrop touch (safe keyboard dismiss on form fields)
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
+                if (overlay.id === 'modal-add-favorite' || overlay.id === 'modal-settings') {
+                    // Safety blur active element to dismiss Tesla virtual keyboard
+                    if (document.activeElement) document.activeElement.blur();
+                    return;
+                }
                 triggerHapticFeedback();
                 overlay.classList.add('hidden');
             }
@@ -697,18 +700,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Favorite / Quick App Modification Save Overlay
     // ==========================================================================
 
-    let selectedFormIcon = 'youtube';
-    const formIconItems = document.querySelectorAll('.selector-icon-item');
-    
-    formIconItems.forEach(item => {
-        item.addEventListener('click', () => {
-            triggerHapticFeedback();
-            formIconItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-            selectedFormIcon = item.getAttribute('data-icon');
-        });
-    });
-
     document.getElementById('btn-save-favorite').addEventListener('click', async () => {
         triggerHapticFeedback();
         const url = document.getElementById('fav-url-input').value.trim();
@@ -724,6 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cleanUrl = normalizeUrl(url);
         const cleanName = name || cleanUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
+        const defaultIcon = 'globe';
         
         if (selectedIsQuickApp) {
             let apps = getQuickApps();
@@ -731,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Edit existing app
                 apps = apps.map(a => {
                     if (a.id === selectedItem.id) {
-                        return { ...a, name: cleanName, url: cleanUrl, icon: selectedFormIcon };
+                        return { ...a, name: cleanName, url: cleanUrl, icon: defaultIcon };
                     }
                     return a;
                 });
@@ -741,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: 'qa-' + Date.now(),
                     name: cleanName,
                     url: cleanUrl,
-                    icon: selectedFormIcon,
+                    icon: defaultIcon,
                     lastOpened: 0
                 });
             }
@@ -756,7 +748,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ...f,
                             name: cleanName,
                             url: cleanUrl,
-                            icon: selectedFormIcon,
+                            icon: defaultIcon,
                             lastUrl: cleanUrl,
                             lastContext: 'Edited URL'
                         };
@@ -769,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: 'fav-' + Date.now(),
                     name: cleanName,
                     url: cleanUrl,
-                    icon: selectedFormIcon,
+                    icon: defaultIcon,
                     lastUrl: cleanUrl,
                     lastContext: 'Direct launch',
                     launchMode: 'optimized',
