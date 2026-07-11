@@ -27,6 +27,38 @@
     --transition-snappy: all 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+/* Light Theme Override Variables */
+.light-theme {
+    --bg-app: #F4F4F6;                 /* Light grey backdrop */
+    --bg-surface: #FFFFFF;             /* Crisp white card base */
+    --bg-surface-elevated: #EAEAEE;    /* Elevated light grey */
+    --border-color: #D2D2D6;           /* Subtle light border */
+    --text-main: #111111;              /* Dark charcoal primary text */
+    --text-muted: #5F6368;             /* Muted grey secondary text */
+    --text-dark: #8E8E93;              /* Inactive text */
+}
+
+/* Light Theme Image Inversions for Dark Logos */
+.light-theme .home-logo,
+.light-theme .header-logo-img {
+    filter: invert(1) hue-rotate(180deg) brightness(0.95);
+    mix-blend-mode: multiply;
+}
+
+/* Material Symbols Custom configuration (Lightweight & Premium) */
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 300, /* Ultra-thin, elegant automotive feel */
+        'GRAD' 0,
+        'opsz' 24;
+    font-size: 22px;
+    display: inline-block;
+    line-height: 1;
+    color: inherit;
+    vertical-align: middle;
+}
+
 /* Reset and Haptic Baseline */
 * {
     box-sizing: border-box;
@@ -41,11 +73,11 @@ body {
     color: var(--text-main);
     font-family: var(--font-ui);
     min-height: 100vh;
-    height: 100vh;
-    overflow: hidden; /* Strict SPA layout - no vertical scroll */
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
+    overflow-y: auto; /* Allow fallback scrolling on smaller screens */
 }
 
 /* Base App Layout (Fixed Viewport ~900px Optimized Landscape) */
@@ -54,7 +86,7 @@ body {
     height: 100vh;
     max-height: 900px;
     max-width: 1440px;
-    padding: 32px 40px;
+    padding: 20px 32px; /* Margins compressed slightly to prevent vertical cutoff */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -70,11 +102,30 @@ body {
    Header Section (Wordmark & Minimal Utilities)
    ========================================================================== */
 .app-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
+}
+
+.header-left {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
 }
 
 .header-brand-wrapper {
@@ -113,11 +164,7 @@ body {
     color: var(--text-muted);
 }
 
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
+/* Header actions wrapper (simplified) */
 
 .header-action-btn {
     background-color: var(--bg-surface);
@@ -139,22 +186,10 @@ body {
     transform: scale(1.02);
 }
 
-.header-action-btn:active {
-    transform: scale(0.96);
-}
-
-.header-action-btn .icon {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
-}
-
 .header-clock {
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-main);
-    min-width: 60px;
-    text-align: right;
     font-variant-numeric: tabular-nums;
 }
 
@@ -166,7 +201,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly; /* Even spacing across screen height */
-    padding: 20px 0;
+    padding: 12px 0;
 }
 
 /* ==========================================================================
@@ -179,8 +214,8 @@ body {
 }
 
 .home-logo {
-    max-width: 440px;
-    width: 60%;
+    max-width: 640px;
+    width: 86%;
     height: auto;
     object-fit: contain;
 }
@@ -309,7 +344,7 @@ body {
     background-color: var(--color-primary);
     border: none;
     border-radius: var(--radius-md);
-    color: var(--text-main);
+    color: #FFFFFF;
     font-family: var(--font-ui);
     font-size: 16px;
     font-weight: 600;
@@ -374,35 +409,58 @@ body {
 }
 
 .quick-apps-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
     width: 100%;
+    flex-wrap: wrap; /* Wraps cleanly to a 2nd line if screen is narrow or extra apps are added */
 }
 
 .quick-app-btn {
-    height: 60px; /* Touch target optimized */
+    width: 108px;
+    height: 100px; /* Taller square cards to balance with favorites */
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     color: var(--text-main);
     font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 12px; /* Sleeker label below icon */
+    font-weight: 600;
     cursor: pointer;
     transition: var(--transition-snappy);
     display: flex;
+    flex-direction: column; /* Stack vertically */
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px; /* Gap between icon and text */
     position: relative;
+    flex-shrink: 0;
 }
 
 .quick-app-btn img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px; /* Balanced rounding for larger logos */
+    object-fit: contain;
+}
+
+.quick-app-symbol {
+    font-size: 40px !important;
+    color: var(--color-primary);
+    transition: var(--transition-snappy);
+}
+
+.quick-app-btn:hover .quick-app-symbol {
+    color: var(--text-main);
+}
+
+.modal-action-favicon-img {
     width: 24px;
     height: 24px;
-    border-radius: 6px;
+    border-radius: 4px;
     object-fit: contain;
+    flex-shrink: 0;
 }
 
 .quick-app-btn:hover {
@@ -446,7 +504,7 @@ body {
 .favorites-section {
     width: 100%;
     max-width: 1100px;
-    margin: 0 auto;
+    margin: 28px auto 0 auto; /* generous spacing, no visual line */
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -822,6 +880,7 @@ body {
     padding: 18px 24px;
     display: flex;
     align-items: center;
+    gap: 16px;
     text-align: left;
     width: 100%;
     cursor: pointer;
@@ -829,12 +888,24 @@ body {
     color: var(--text-main);
 }
 
+.modal-action-icon {
+    font-size: 20px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: var(--transition-snappy);
+}
+
+.modal-action-row:hover .modal-action-icon {
+    color: var(--text-main);
+    transform: scale(1.05);
+}
+
 .modal-action-row:last-child {
     border-bottom: none;
 }
 
 .modal-action-row:hover {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(128, 128, 128, 0.06);
 }
 
 .modal-action-details {
@@ -891,7 +962,7 @@ body {
     background-color: var(--color-primary);
     border: none;
     border-radius: var(--radius-sm);
-    color: var(--text-main);
+    color: #FFFFFF;
     font-family: var(--font-ui);
     font-size: 14px;
     font-weight: 600;
@@ -1028,7 +1099,7 @@ input:checked + .slider:before {
 
 .segment-btn.active {
     background-color: var(--color-primary);
-    color: var(--text-main);
+    color: #FFFFFF;
 }
 
 /* ==========================================================================
@@ -1104,9 +1175,60 @@ input:checked + .slider:before {
     background-color: var(--color-primary);
     border-radius: 2px;
     transition: width 1.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+    animation: progressPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes progressPulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+/* GPU-Accelerated Snappy Tactile Buttons Active Press Scale */
+.btn-launch-primary:active,
+.btn-launch-secondary:active,
+.quick-app-btn:active,
+.smart-card:active,
+.segment-btn:active,
+.assist-btn:active,
+.header-action-btn:active,
+.btn-modal-primary:active,
+.btn-modal-danger:active,
+.modal-action-row:active,
+.modal-close:active {
+    transform: scale(0.96) !important;
 }
 
 .redirect-fallback-tip {
     font-size: 11px;
     color: var(--text-dark);
 }
+
+/* ==========================================================================
+   Footer & Legal Disclaimer Section
+   ========================================================================== */
+.app-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    width: 100%;
+}
+
+.footer-made-by {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.footer-disclaimer {
+    font-size: 9px;
+    color: var(--text-dark);
+    line-height: 1.3;
+    max-width: 800px;
+    margin: 0 auto;
+}
+

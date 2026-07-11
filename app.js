@@ -14,10 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Default configuration for initial quick apps
     const DEFAULT_QUICK_APPS = [
-        { id: 'qa-youtube', name: 'YouTube', url: 'https://www.youtube.com', icon: 'youtube', lastOpened: 0 },
-        { id: 'qa-twitch', name: 'Twitch', url: 'https://www.twitch.tv', icon: 'twitch', lastOpened: 0 },
         { id: 'qa-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'plex', lastOpened: 0 },
-        { id: 'qa-jellyfin', name: 'Jellyfin', url: 'https://jellyfin.org', icon: 'globe', lastOpened: 0 }
+        { id: 'qa-disney', name: 'Disney Plus', url: 'https://www.disneyplus.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-prime', name: 'Prime Video', url: 'https://www.primevideo.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-hbo', name: 'HBO', url: 'https://www.max.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-paramount', name: 'Paramount', url: 'https://www.paramountplus.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-molotov', name: 'Molotov TV', url: 'https://www.molotov.tv', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-jellyfin', name: 'Jellyfin', url: 'https://jellyfin.org', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-iptv', name: 'IPTV', url: 'https://iptv.local', icon: 'globe', lastOpened: 0 }
     ];
 
     let selectedItem = null;
@@ -31,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultSettings = {
         vibrationEnabled: true,
         longPressDuration: 800, // snappier touch holds
-        timeFormat24h: true
+        timeFormat24h: true,
+        theme: 'dark'
     };
 
     let settings = JSON.parse(localStorage.getItem('teslaLauncherSettings_v4')) || {...defaultSettings};
@@ -185,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (appUpdated) {
-                localStorage.setItem('tesla_launcher_quick_apps_v4', JSON.stringify(apps));
+                localStorage.setItem('tesla_launcher_quick_apps_v6', JSON.stringify(apps));
                 renderQuickApps();
                 return;
             }
@@ -319,18 +325,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Quick Apps ---
     function getQuickApps() {
-        const appsKeyV4 = 'tesla_launcher_quick_apps_v4';
-        const apps = localStorage.getItem(appsKeyV4);
-        if (apps) {
-            return JSON.parse(apps);
+        const appsKeyV6 = 'tesla_launcher_quick_apps_v6';
+        const appsStr = localStorage.getItem(appsKeyV6);
+        let appsList = [];
+        if (appsStr) {
+            appsList = JSON.parse(appsStr);
+        } else {
+            localStorage.setItem(appsKeyV6, JSON.stringify(DEFAULT_QUICK_APPS));
+            appsList = [...DEFAULT_QUICK_APPS];
         }
         
-        localStorage.setItem(appsKeyV4, JSON.stringify(DEFAULT_QUICK_APPS));
-        return DEFAULT_QUICK_APPS;
+        // Enforce: IPTV is always last in the list
+        const iptvIndex = appsList.findIndex(a => a.id === 'qa-iptv');
+        if (iptvIndex > -1) {
+            const iptvItem = appsList.splice(iptvIndex, 1)[0];
+            appsList.push(iptvItem);
+        }
+        return appsList;
     }
 
     function saveQuickApps(apps) {
-        localStorage.setItem('tesla_launcher_quick_apps_v4', JSON.stringify(apps));
+        localStorage.setItem('tesla_launcher_quick_apps_v6', JSON.stringify(apps));
         renderQuickApps();
     }
 
@@ -505,18 +520,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
             } catch (e) {}
 
+            let iconHtml = `<img src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(app.name)}">`;
+            if (app.id === 'qa-iptv') {
+                iconHtml = `<span class="material-symbols-outlined quick-app-symbol">tv</span>`;
+            }
+
             btn.innerHTML = `
                 <button class="card-delete-badge" title="Delete">&times;</button>
-                <img src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(app.name)}">
+                ${iconHtml}
                 <span>${escapeHtml(app.name)}</span>
             `;
 
             // Delete badge triggers in edit mode
             const delBtn = btn.querySelector('.card-delete-badge');
-            if (editModeQuickApps) delBtn.style.display = 'flex';
+            if (app.id === 'qa-iptv') {
+                delBtn.style.display = 'none';
+            } else if (editModeQuickApps) {
+                delBtn.style.display = 'flex';
+            }
             
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (app.id === 'qa-iptv') return;
                 if (confirm(`Remove Quick App ${app.name}?`)) {
                     let updatedApps = getQuickApps().filter(a => a.id !== app.id);
                     saveQuickApps(updatedApps);
@@ -559,6 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startPress = (e) => {
             if (e.target.closest('.card-delete-badge')) return;
+            if (item.id === 'qa-iptv') return; // Enforce no long-press options for IPTV
             isLongPress = false;
             isScrolling = false;
             pressTimer = setTimeout(() => {
@@ -580,6 +606,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!isLongPress) {
                 triggerHapticFeedback();
+                if (item.id === 'qa-iptv') {
+                    openModal('modal-iptv-selector');
+                    return;
+                }
                 // Launch last URL context if saved, otherwise default url
                 const targetUrl = item.lastUrl || item.url;
                 launch(targetUrl, item.launchMode || 'optimized');
@@ -786,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 optMoveLeft.style.opacity = '1';
                 optMoveLeft.style.pointerEvents = 'auto';
             }
-            if (idx === -1 || idx >= apps.length - 1) {
+            if (idx === -1 || idx >= apps.length - 1 || apps[idx + 1].id === 'qa-iptv') {
                 optMoveRight.style.opacity = '0.3';
                 optMoveRight.style.pointerEvents = 'none';
             } else {
@@ -875,7 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerHapticFeedback();
             let apps = getQuickApps();
             const idx = apps.findIndex(a => a.id === selectedItem.id);
-            if (idx !== -1 && idx < apps.length - 1) {
+            if (idx !== -1 && idx < apps.length - 1 && apps[idx + 1].id !== 'qa-iptv') {
                 // Swap position
                 const temp = apps[idx];
                 apps[idx] = apps[idx + 1];
@@ -1001,6 +1031,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        const currentTheme = settings.theme || 'dark';
+        const themeButtons = document.querySelectorAll('#theme-control .segment-btn');
+        themeButtons.forEach(btn => {
+            const val = btn.getAttribute('data-value');
+            if (val === currentTheme) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-theme');
+        } else {
+            document.body.classList.remove('light-theme');
+        }
+
         updateClockDisplay();
     }
 
@@ -1053,6 +1100,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    document.querySelectorAll('#theme-control .segment-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            triggerHapticFeedback();
+            const value = btn.getAttribute('data-value');
+            settings.theme = value;
+            saveSettings();
+        });
+    });
+
+    // Fullscreen Launcher Header Button click event
+    document.getElementById('btn-fullscreen-launcher').addEventListener('click', () => {
+        triggerHapticFeedback();
+        launch(window.location.href, 'optimized');
+    });
+
     document.getElementById('btn-reset-settings').addEventListener('click', () => {
         if (confirm('Reset all settings to default?')) {
             settings = {...defaultSettings};
@@ -1067,6 +1129,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (redirectScreen) redirectScreen.classList.add('hidden');
         const progress = document.getElementById('redirect-progress');
         if (progress) progress.style.width = '0%';
+    });
+
+    // IPTV Selector Modal Web Player Choices click event
+    document.querySelectorAll('.iptv-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            triggerHapticFeedback();
+            closeModal('modal-iptv-selector');
+            const playerUrl = btn.getAttribute('data-url');
+            launch(playerUrl, 'optimized');
+        });
     });
 
     // ==========================================================================
