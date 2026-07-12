@@ -550,28 +550,26 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.appendChild(btn);
         });
 
-        // If in edit mode, append the Add button to the grid
-        if (editModeQuickApps) {
-            const addBtn = document.createElement('button');
-            addBtn.className = 'quick-app-btn';
-            addBtn.style.borderStyle = 'dashed';
-            addBtn.style.borderColor = 'var(--text-dark)';
-            addBtn.innerHTML = `
-                <span style="font-size: 20px; font-weight: bold; color: var(--text-muted);">+</span>
-                <span style="color: var(--text-muted);">Add App</span>
-            `;
-            
-            addBtn.addEventListener('click', () => {
-                triggerHapticFeedback();
-                document.getElementById('fav-url-input').value = document.getElementById('url-input').value;
-                document.getElementById('fav-label-input').value = '';
-                document.getElementById('fav-modal-title').textContent = 'Add to Quick Apps';
-                selectedIsQuickApp = true;
-                selectedItem = null;
-                openModal('modal-add-favorite');
-            });
-            grid.appendChild(addBtn);
-        }
+        // Append the Add button to the grid (unconditionally to preserve visibility/discoverability)
+        const addBtn = document.createElement('button');
+        addBtn.className = 'quick-app-btn';
+        addBtn.style.borderStyle = 'dashed';
+        addBtn.style.borderColor = 'var(--text-dark)';
+        addBtn.innerHTML = `
+            <span style="font-size: 20px; font-weight: bold; color: var(--text-muted);">+</span>
+            <span style="color: var(--text-muted);">Add App</span>
+        `;
+        
+        addBtn.addEventListener('click', () => {
+            triggerHapticFeedback();
+            document.getElementById('fav-url-input').value = document.getElementById('url-input').value;
+            document.getElementById('fav-label-input').value = '';
+            document.getElementById('fav-modal-title').textContent = 'Add to Quick Apps';
+            selectedIsQuickApp = true;
+            selectedItem = null;
+            openModal('modal-add-favorite');
+        });
+        grid.appendChild(addBtn);
     }
 
     // Handles tap vs long press for tactile comfort
