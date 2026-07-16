@@ -6,23 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Default configuration for initial launcher favorites (v4)
     const DEFAULT_FAVORITES = [
-        { id: 'fav-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://tv.apple.com', launchMode: 'optimized', lastOpened: 0 },
-        { id: 'fav-disney', name: 'Disney+', url: 'https://www.disneyplus.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://www.disneyplus.com', launchMode: 'optimized', lastOpened: 0 },
-        { id: 'fav-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'plex', lastContext: 'Direct launch', lastUrl: 'https://app.plex.tv/desktop', launchMode: 'optimized', lastOpened: 0 },
-        { id: 'fav-canal', name: 'Canal+', url: 'https://www.canalplus.com', icon: 'globe', lastContext: 'Direct launch', lastUrl: 'https://www.canalplus.com', launchMode: 'optimized', lastOpened: 0 }
+        { id: 'fav-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'globe', lastContext: 'Just now', lastUrl: 'https://app.plex.tv/desktop', launchMode: 'optimized', lastOpened: 600000 },
+        { id: 'fav-youtube', name: 'YouTube', url: 'https://www.youtube.com', icon: 'globe', lastContext: '5 min ago', lastUrl: 'https://www.youtube.com', launchMode: 'optimized', lastOpened: 500000 },
+        { id: 'fav-netflix', name: 'Netflix', url: 'https://www.netflix.com', icon: 'globe', lastContext: '22 min ago', lastUrl: 'https://www.netflix.com', launchMode: 'optimized', lastOpened: 400000 },
+        { id: 'fav-disney', name: 'Disney+', url: 'https://www.disneyplus.com', icon: 'globe', lastContext: '1 h ago', lastUrl: 'https://www.disneyplus.com', launchMode: 'optimized', lastOpened: 300000 },
+        { id: 'fav-twitch', name: 'Twitch', url: 'https://www.twitch.tv', icon: 'globe', lastContext: '2 h ago', lastUrl: 'https://www.twitch.tv', launchMode: 'optimized', lastOpened: 200000 },
+        { id: 'fav-reddit', name: 'Reddit', url: 'https://www.reddit.com', icon: 'globe', lastContext: '3 h ago', lastUrl: 'https://www.reddit.com', launchMode: 'optimized', lastOpened: 100000 }
     ];
 
     // Default configuration for initial quick apps
     const DEFAULT_QUICK_APPS = [
-        { id: 'qa-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'plex', lastOpened: 0 },
-        { id: 'qa-disney', name: 'Disney Plus', url: 'https://www.disneyplus.com', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-youtube', name: 'YouTube', url: 'https://www.youtube.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-netflix', name: 'Netflix', url: 'https://www.netflix.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-disney', name: 'Disney+', url: 'https://www.disneyplus.com', icon: 'globe', lastOpened: 0 },
         { id: 'qa-prime', name: 'Prime Video', url: 'https://www.primevideo.com', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-hbo', name: 'HBO', url: 'https://www.max.com', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-paramount', name: 'Paramount', url: 'https://www.paramountplus.com', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-molotov', name: 'Molotov TV', url: 'https://www.molotov.tv', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-jellyfin', name: 'Jellyfin', url: 'https://jellyfin.org', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-iptv', name: 'IPTV', url: 'https://iptv.local', icon: 'globe', lastOpened: 0 }
+        { id: 'qa-hbo', name: 'HBO Max', url: 'https://www.max.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-paramount', name: 'Paramount+', url: 'https://www.paramountplus.com', icon: 'globe', lastOpened: 0 }
     ];
 
     let selectedItem = null;
@@ -125,6 +126,29 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
+
+    /* REVIEW-001 #6 — Request highest practical resolution (256px)
+       and provide lightweight onerror fallback chain. */
+    function getFaviconUrl(url) {
+        try {
+            const hostname = new URL(normalizeUrl(url)).hostname;
+            return `https://www.google.com/s2/favicons?domain=${hostname}&sz=256`;
+        } catch (e) {
+            return 'asset/icon.png';
+        }
+    }
+
+    window.faviconFallback = function(img) {
+        if (!img.dataset.retried) {
+            img.dataset.retried = '1';
+            const src = img.src;
+            if (src.includes('sz=256')) {
+                img.src = src.replace('sz=256', 'sz=64');
+                return;
+            }
+        }
+        img.src = 'asset/icon.png';
+    };
 
     // ==========================================================================
     // Smart Memory State Engine
@@ -438,23 +462,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 contextText = 'Direct launch';
             }
             
-            let faviconUrl = 'asset/icon.png';
-            try {
-                const hostname = new URL(item.url).hostname;
-                faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
-            } catch (e) {}
+            const faviconUrl = getFaviconUrl(item.url);
             
             card.innerHTML = `
                 <button class="card-delete-badge" title="Delete">&times;</button>
                 <div class="smart-card-header">
                     <div class="smart-card-brand">
-                        <img class="smart-card-icon" src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(item.name)}">
+                        <img class="smart-card-icon" src="${faviconUrl}" onerror="faviconFallback(this)" alt="${escapeHtml(item.name)}">
                         <span class="smart-card-title">${escapeHtml(item.name)}</span>
                     </div>
                 </div>
                 <div class="smart-card-meta-row">
                     <span class="smart-card-context">${escapeHtml(contextText)}</span>
-                    <button class="smart-card-launch-btn" ${item.isRecent ? 'style="color: #9AA0A6;"' : ''}>▶ Open</button>
+                    <button class="smart-card-launch-btn" ${item.isRecent ? 'style="color: #9AA0A6;"' : ''}>Open</button>
                 </div>
             `;
 
@@ -483,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addCard.className = 'smart-card add-favorite-card';
         addCard.innerHTML = `
             <div class="add-card-icon">+</div>
-            <span class="add-card-label">Add Favorite</span>
+            <span class="add-card-label">Add</span>
         `;
         
         addCard.addEventListener('click', () => {
@@ -512,19 +532,15 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = 'quick-app-btn';
             btn.setAttribute('data-id', app.id);
             
-            let faviconUrl = 'asset/icon.png';
-            try {
-                const hostname = new URL(app.url).hostname;
-                faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
-            } catch (e) {}
+            const faviconUrl = getFaviconUrl(app.url);
 
-            let iconHtml = `<img src="${faviconUrl}" onerror="this.src='asset/icon.png'" alt="${escapeHtml(app.name)}">`;
+            let iconHtml = `<img src="${faviconUrl}" onerror="faviconFallback(this)" alt="${escapeHtml(app.name)}">`;
             if (app.id === 'qa-iptv') {
                 iconHtml = `<span class="material-symbols-outlined quick-app-symbol">tv</span>`;
             }
 
             btn.innerHTML = `
-                <button class="card-delete-badge" title="Delete">&times;</button>
+                <span class="card-delete-badge" role="button" aria-label="Delete">&times;</span>
                 ${iconHtml}
                 <span>${escapeHtml(app.name)}</span>
             `;
@@ -552,12 +568,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Append the Add button to the grid (unconditionally to preserve visibility/discoverability)
         const addBtn = document.createElement('button');
-        addBtn.className = 'quick-app-btn';
-        addBtn.style.borderStyle = 'dashed';
-        addBtn.style.borderColor = 'var(--text-dark)';
+        addBtn.className = 'quick-app-btn add-quick-app-btn';
         addBtn.innerHTML = `
-            <span style="font-size: 20px; font-weight: bold; color: var(--text-muted);">+</span>
-            <span style="color: var(--text-muted);">Add App</span>
+            <span class="add-card-icon">+</span>
+            <span class="add-card-label">Add</span>
         `;
         
         addBtn.addEventListener('click', () => {
@@ -915,11 +929,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('fav-label-input').value = selectedItem.name;
             document.getElementById('fav-modal-title').textContent = selectedIsQuickApp ? 'Edit Quick App' : 'Edit Favorite';
             
-            formIconItems.forEach(item => {
-                item.classList.toggle('active', item.getAttribute('data-icon') === selectedItem.icon);
-            });
-            selectedFormIcon = selectedItem.icon;
-            
             openModal('modal-add-favorite');
         }
     });
@@ -987,10 +996,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    btnDirect.addEventListener('click', () => {
-        triggerHapticFeedback();
-        launch(urlInput.value, 'direct');
-    });
+    if (btnDirect) {
+        btnDirect.addEventListener('click', () => {
+            triggerHapticFeedback();
+            launch(urlInput.value, 'direct');
+        });
+    }
     btnOptimized.addEventListener('click', () => {
         triggerHapticFeedback();
         launch(urlInput.value, 'optimized');
@@ -1022,20 +1033,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const currentTheme = settings.theme || 'dark';
-        const themeButtons = document.querySelectorAll('#theme-control .segment-btn');
-        themeButtons.forEach(btn => {
-            const val = btn.getAttribute('data-value');
-            if (val === currentTheme) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-
         if (currentTheme === 'light') {
             document.body.classList.add('light-theme');
         } else {
             document.body.classList.remove('light-theme');
+        }
+
+        const themeToggle = document.getElementById('btn-theme-toggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('.material-symbols-outlined');
+            if (icon) icon.textContent = currentTheme === 'light' ? 'light_mode' : 'dark_mode';
+            themeToggle.setAttribute('aria-label', currentTheme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
         }
 
         updateClockDisplay();
@@ -1061,6 +1069,15 @@ document.addEventListener('DOMContentLoaded', () => {
             clockEl.textContent = `${hours}:${minutes}${ampm}`;
         } else {
             clockEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes}`;
+        }
+
+        const dateEl = document.querySelector('.header-date');
+        if (dateEl) {
+            dateEl.textContent = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
         }
     }
 
@@ -1090,14 +1107,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('#theme-control .segment-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+    const themeToggle = document.getElementById('btn-theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
             triggerHapticFeedback();
-            const value = btn.getAttribute('data-value');
-            settings.theme = value;
+            settings.theme = (settings.theme || 'dark') === 'dark' ? 'light' : 'dark';
             saveSettings();
         });
-    });
+    }
 
     // Fullscreen Launcher Header Button click event
     document.getElementById('btn-fullscreen-launcher').addEventListener('click', () => {

@@ -1229,3 +1229,566 @@ input:checked + .slider:before {
     margin: 0 auto;
 }
 
+/* ==========================================================================
+   Home Screen V1 - Validated Tesla HMI
+   ========================================================================== */
+:root {
+    --bg-app: #05070B;
+    --bg-surface: rgba(14, 17, 24, 0.76);
+    --bg-surface-strong: rgba(10, 12, 18, 0.92);
+    --border-color: rgba(255, 255, 255, 0.14);
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --color-primary: #E82127;
+    --color-primary-hover: #F02B31;
+    --text-main: #F7F7F8;
+    --text-muted: #A1A6B2;
+    --text-dark: #687280;
+    --shadow-card: 0 14px 34px rgba(0, 0, 0, 0.36);
+    --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.24);
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --transition-snappy: color 120ms ease-out, border-color 120ms ease-out, background-color 120ms ease-out, transform 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+/* REVIEW-001 #2 — Light theme: premium warm grey foundation, stronger
+   card separation, reinforced borders and desaturated background. */
+body.light-theme {
+    --bg-app: #E4E7EC;
+    --bg-surface: rgba(255, 255, 255, 0.82);
+    --bg-surface-strong: rgba(255, 255, 255, 0.94);
+    --border-color: rgba(17, 20, 28, 0.16);
+    --border-soft: rgba(17, 20, 28, 0.10);
+    --text-main: #111318;
+    --text-muted: #4E545E;
+    --text-dark: #6E7580;
+    --shadow-card: 0 10px 24px rgba(40, 52, 72, 0.14);
+    --shadow-soft: 0 6px 18px rgba(40, 52, 72, 0.10);
+}
+
+html,
+body {
+    width: 100%;
+    min-width: 100%;
+}
+
+body {
+    background:
+        radial-gradient(ellipse at 50% 38%, rgba(37, 43, 57, 0.42) 0%, rgba(6, 8, 13, 0.72) 34%, rgba(2, 4, 8, 0.98) 78%),
+        linear-gradient(160deg, rgba(3, 5, 9, 0.96) 0%, rgba(12, 15, 24, 0.92) 44%, rgba(3, 5, 8, 0.98) 100%);
+}
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* REVIEW-001 #3 — Reduce geometric background shape visibility.
+   Shapes stay atmospheric but never compete with cards or text. */
+body::before {
+    background:
+        linear-gradient(150deg, transparent 0 18%, rgba(21, 26, 37, 0.38) 18.2% 28%, transparent 28.2%),
+        linear-gradient(28deg, transparent 0 18%, rgba(16, 20, 29, 0.42) 18.3% 32%, transparent 32.2%),
+        radial-gradient(ellipse at 52% 36%, rgba(232, 33, 39, 0.06), transparent 32%),
+        radial-gradient(ellipse at 86% 52%, rgba(232, 33, 39, 0.07), transparent 24%);
+    opacity: 0.7;
+}
+
+body::after {
+    background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.34), transparent 26%, rgba(0, 0, 0, 0.44) 100%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 4px);
+}
+
+/* REVIEW-001 #2 — Desaturated and darkened light-theme background artwork */
+body.light-theme {
+    background:
+        radial-gradient(ellipse at 52% 42%, rgba(240, 242, 246, 0.9) 0%, rgba(224, 228, 236, 0.78) 38%, rgba(210, 216, 226, 0.92) 100%),
+        linear-gradient(155deg, #DFE3EA 0%, #EBEEF3 48%, #D6DBE2 100%);
+}
+
+/* REVIEW-001 #2 — Reduced light-theme geometric contrast */
+body.light-theme::before {
+    background:
+        linear-gradient(150deg, transparent 0 17%, rgba(190, 198, 212, 0.52) 17.3% 31%, transparent 31.2%),
+        linear-gradient(28deg, transparent 0 18%, rgba(198, 206, 218, 0.56) 18.3% 34%, transparent 34.2%),
+        radial-gradient(ellipse at 86% 55%, rgba(232, 33, 39, 0.06), transparent 28%);
+}
+
+body.light-theme::after {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), transparent 30%, rgba(255, 255, 255, 0.2) 100%);
+}
+
+.app-container {
+    max-width: 1536px;
+    max-height: 1024px;
+    min-height: 720px;
+    padding: 20px 30px 14px;
+    justify-content: flex-start;
+    gap: 0;
+}
+
+.app-header {
+    height: 66px;
+    padding: 0;
+    border-bottom: none;
+}
+
+/* REVIEW-001 #1 — Header logo reduced ~22% for better alignment */
+.tesla-mark {
+    color: var(--color-primary);
+    font-family: var(--font-brand);
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 0.8;
+    width: 62px;
+    height: 48px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    transform: scaleX(1.32);
+    text-shadow: 0 0 12px rgba(232, 33, 39, 0.2);
+}
+
+.header-center {
+    gap: 14px;
+    color: var(--text-main);
+    min-width: 310px;
+}
+
+.header-time-icon {
+    font-size: 21px;
+    color: var(--text-main);
+}
+
+.header-clock {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.header-divider,
+.footer-divider {
+    width: 1px;
+    height: 24px;
+    background-color: var(--border-color);
+}
+
+.header-date {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.header-right {
+    gap: 24px;
+}
+
+.header-action-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    box-shadow: var(--shadow-soft);
+    position: relative;
+}
+
+.header-action-btn .material-symbols-outlined {
+    font-size: 31px;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
+
+.header-action-btn.active-theme::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    left: 50%;
+    bottom: -5px;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px rgba(232, 33, 39, 0.72);
+}
+
+.app-main {
+    flex: 1;
+    padding: 8px 18px 0;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.console-section {
+    max-width: 892px;
+    gap: 16px;
+    margin-top: -18px;
+}
+
+.home-logo-container {
+    height: 116px;
+    overflow: hidden;
+}
+
+.home-logo {
+    max-width: 508px;
+    width: 52vw;
+    transform: translateY(-2px);
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
+}
+
+body.light-theme .home-logo {
+    filter: invert(1) hue-rotate(180deg) brightness(0.2) drop-shadow(0 5px 14px rgba(255, 255, 255, 0.22));
+    mix-blend-mode: multiply;
+}
+
+.console-input-wrapper {
+    height: 78px;
+    display: grid;
+    grid-template-columns: 64px 1fr 208px;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.025));
+    border: 1px solid var(--border-color);
+    border-radius: 26px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+
+body.light-theme .console-input-wrapper {
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.launcher-link-icon {
+    justify-self: center;
+    font-size: 31px;
+    color: var(--text-main);
+}
+
+#url-input {
+    height: 100%;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0 48px 0 0;
+    font-size: 22px;
+    font-weight: 400;
+    box-shadow: none;
+}
+
+#url-input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+}
+
+#url-input:focus {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.clear-btn-overlay {
+    right: 214px;
+}
+
+.btn-launch-primary {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: linear-gradient(180deg, #E82127, #A90F18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 10px 24px rgba(232, 33, 39, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.btn-launch-primary .material-symbols-outlined {
+    font-size: 34px;
+}
+
+.quick-apps-section,
+.favorites-section {
+    width: 100%;
+    max-width: none;
+    gap: 18px;
+    margin: 0;
+}
+
+.section-header {
+    padding: 0;
+}
+
+.section-title {
+    color: var(--text-main);
+    font-size: 20px;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-title::before {
+    content: "";
+    width: 3px;
+    height: 22px;
+    border-radius: 3px;
+    background-color: var(--color-primary);
+    box-shadow: 0 0 10px rgba(232, 33, 39, 0.45);
+}
+
+.edit-favorites-btn {
+    color: var(--color-primary);
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 14px;
+}
+
+.edit-favorites-btn::after {
+    content: " edit";
+    font-family: "Material Symbols Outlined";
+    font-size: 18px;
+    vertical-align: -3px;
+    margin-left: 8px;
+}
+
+.quick-apps-grid {
+    gap: 14px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 3px;
+}
+
+.quick-apps-grid::-webkit-scrollbar,
+.favorites-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.quick-app-btn {
+    width: 144px;
+    height: 170px;
+    border-radius: 13px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.018));
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card);
+    gap: 26px;
+    font-size: 18px;
+    font-weight: 500;
+    flex: 0 0 144px;
+}
+
+.quick-app-btn:hover,
+.smart-card:hover {
+    border-color: var(--border-color);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.018));
+    transform: none;
+    box-shadow: var(--shadow-card);
+}
+
+body.light-theme .quick-app-btn:hover,
+body.light-theme .smart-card:hover {
+    background: rgba(255, 255, 255, 0.68);
+}
+
+/* REVIEW-001 #2 — Stronger card separation on light theme */
+body.light-theme .quick-app-btn,
+body.light-theme .smart-card {
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(17, 20, 28, 0.13);
+    box-shadow: 0 4px 16px rgba(40, 52, 72, 0.10);
+}
+
+.quick-app-btn img {
+    width: 74px;
+    height: 74px;
+    border-radius: 12px;
+}
+
+.quick-app-btn .card-delete-badge {
+    top: 10px;
+    right: 10px;
+}
+
+.quick-app-symbol {
+    font-size: 62px !important;
+    color: var(--text-muted);
+}
+
+.favorites-section {
+    margin-top: 4px;
+}
+
+/* REVIEW-001 #5 — Fix right-side clipping: deliberate edge fade mask
+   shows a partial preview of the next card instead of hard clipping. */
+.carousel-outer {
+    margin: 0;
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 92%, transparent 100%);
+}
+
+.favorites-carousel {
+    gap: 14px;
+    padding: 0 24px 4px 0;
+}
+
+.smart-card {
+    flex: 0 0 220px;
+    width: 220px;
+    height: 90px;
+    border-radius: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.018));
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card);
+}
+
+.smart-card-header {
+    min-height: 34px;
+}
+
+.smart-card-brand {
+    max-width: calc(100% - 28px);
+    gap: 14px;
+}
+
+/* REVIEW-001 #6 — Normalized favicon size across all cards */
+.smart-card-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    object-fit: contain;
+    background-color: rgba(128, 128, 128, 0.08);
+}
+
+.smart-card-title {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.smart-card-context {
+    font-size: 14px;
+    max-width: 70%;
+}
+
+.smart-card-launch-btn {
+    font-size: 0;
+    color: var(--text-muted);
+}
+
+.smart-card-launch-btn::after {
+    content: "chevron_right";
+    font-family: "Material Symbols Outlined";
+    font-size: 30px;
+    font-weight: 300;
+}
+
+.add-favorite-card,
+.quick-app-btn.add-quick-app-btn {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.015);
+    color: var(--text-muted);
+}
+
+.quick-app-btn.add-quick-app-btn {
+    width: 116px;
+    flex-basis: 116px;
+}
+
+body.light-theme .add-favorite-card,
+body.light-theme .quick-app-btn.add-quick-app-btn {
+    border-color: rgba(17, 20, 28, 0.22);
+    background: rgba(255, 255, 255, 0.42);
+}
+
+.add-card-icon {
+    width: auto;
+    height: auto;
+    background: transparent;
+    border: none;
+    font-size: 42px;
+    font-weight: 200;
+}
+
+.add-card-label {
+    font-size: 18px;
+}
+
+.app-footer {
+    position: relative;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+.footer-credit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-heart {
+    color: var(--color-primary);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.footer-info-btn {
+    position: absolute;
+    right: 0;
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.footer-info-btn .material-symbols-outlined {
+    font-size: 28px;
+}
+
+body.light-theme .tesla-mark,
+body.light-theme .footer-heart,
+body.light-theme .section-title::before,
+body.light-theme .edit-favorites-btn {
+    color: var(--color-primary);
+}
+
+@media (max-width: 1180px) {
+    .app-container {
+        padding: 18px 20px 12px;
+    }
+
+    .app-main {
+        padding-inline: 0;
+        gap: 22px;
+    }
+
+    .console-section {
+        margin-top: 12px;
+    }
+
+    .quick-app-btn {
+        width: 132px;
+        height: 154px;
+        flex-basis: 132px;
+        font-size: 15px;
+    }
+
+    .smart-card {
+        flex-basis: 198px;
+        width: 198px;
+    }
+}

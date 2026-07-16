@@ -17,21 +17,22 @@
         <!-- HEADER -->
         <header class="app-header">
             <div class="header-left">
-                <div class="header-brand-wrapper">
-                    <img src="asset/header-logo.png" alt="Tesla Fullscreen Launcher" class="header-logo-img">
-                </div>
+                <div class="tesla-mark" aria-label="Tesla">T</div>
             </div>
             <div class="header-center">
+                <span class="material-symbols-outlined header-time-icon">schedule</span>
                 <span class="header-clock">--:--</span>
+                <span class="header-divider"></span>
+                <span class="header-date">--</span>
             </div>
             <div class="header-right">
-                <button id="btn-help" class="header-action-btn" title="Help & Connection Guide">
-                    <span class="material-symbols-outlined">help</span>
+                <button id="btn-theme-toggle" class="header-action-btn active-theme" title="Toggle theme" type="button">
+                    <span class="material-symbols-outlined">dark_mode</span>
                 </button>
-                <button id="btn-settings" class="header-action-btn" title="Settings">
+                <button id="btn-settings" class="header-action-btn" title="Settings" type="button">
                     <span class="material-symbols-outlined">settings</span>
                 </button>
-                <button id="btn-fullscreen-launcher" class="header-action-btn" title="Go Fullscreen">
+                <button id="btn-fullscreen-launcher" class="header-action-btn" title="Go Fullscreen" type="button">
                     <span class="material-symbols-outlined">open_in_full</span>
                 </button>
             </div>
@@ -42,28 +43,21 @@
             <!-- INPUT CONSOLE -->
             <section class="console-section">
                 <div class="home-logo-container">
-                    <img src="asset/home-logo.png" alt="Tesla Launcher Logo" class="home-logo">
-                </div>
-                <div class="console-label-row">
-                    <span class="console-label">🔗 Paste a link or search</span>
+                <!-- TODO: Replace this cropped raster asset with a dedicated
+                     transparent wordmark SVG (text only, no slogan).
+                     The final asset will come from assets/02_logos/. -->
+                <img src="asset/home-logo.png" alt="Tesla Launcher Logo" class="home-logo">
                 </div>
                 <div class="console-input-wrapper">
-                    <input type="text" id="url-input" placeholder="https://" autocomplete="off" spellcheck="false">
+                    <span class="material-symbols-outlined launcher-link-icon">link</span>
+                    <input type="text" id="url-input" placeholder="Just paste your URL/link" autocomplete="off" spellcheck="false">
                     <button id="clear-btn" class="clear-btn-overlay">
                         <span class="material-symbols-outlined">close</span>
                     </button>
-                </div>
-                <!-- Keyboard assists -->
-                <div class="touch-assist-row">
-                    <button class="assist-btn" data-value="https://">https://</button>
-                    <button class="assist-btn" data-value="www.">www.</button>
-                    <button class="assist-btn" data-value=".com">.com</button>
-                    <button class="assist-btn" data-value="/">/</button>
-                </div>
-                <!-- Launch Controls -->
-                <div class="launch-controls">
-                    <button id="btn-optimized" class="btn-launch-primary">OPEN FULLSCREEN</button>
-                    <button id="btn-direct" class="btn-launch-secondary">Open normally</button>
+                    <button id="btn-optimized" class="btn-launch-primary" type="button">
+                        <span>LAUNCH</span>
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
                 </div>
             </section>
 
@@ -81,7 +75,7 @@
             <!-- FAVORITES / SMART CARDS CAROUSEL -->
             <section class="favorites-section">
                 <div class="section-header">
-                    <span class="section-title">Recent & Favorites</span>
+                    <span class="section-title">Last Opened</span>
                     <button id="btn-edit-favorites" class="edit-favorites-btn">Edit</button>
                 </div>
                 <div class="carousel-outer">
@@ -91,6 +85,18 @@
                 </div>
             </section>
         </main>
+        <footer class="app-footer">
+            <div class="footer-credit">
+                <span>Made with</span>
+                <span class="footer-heart">♥</span>
+                <span>by <strong>BFMIX</strong></span>
+                <span class="footer-divider"></span>
+                <span>A Tesla Owner for Tesla Owners</span>
+            </div>
+            <button id="btn-help" class="footer-info-btn" title="Help & Connection Guide" type="button">
+                <span class="material-symbols-outlined">info</span>
+            </button>
+        </footer>
     </div>
 
     <!-- MODAL: REDIRECT (FULLSCREEN LOADER) -->
@@ -301,16 +307,6 @@
                     <div class="segmented-control" id="time-format-control">
                         <button type="button" class="segment-btn active" data-value="24h">24h</button>
                         <button type="button" class="segment-btn" data-value="12h">12h</button>
-                    </div>
-                </div>
-                <div class="settings-row">
-                    <div class="settings-info">
-                        <span class="settings-name">Theme</span>
-                        <span class="settings-desc">Choose between dark and light appearance</span>
-                    </div>
-                    <div class="segmented-control" id="theme-control">
-                        <button type="button" class="segment-btn active" data-value="dark">Dark</button>
-                        <button type="button" class="segment-btn" data-value="light">Light</button>
                     </div>
                 </div>
                 <div class="settings-row" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 16px;">
