@@ -26,9 +26,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Agentic AI and Antigravity directories
-.gemini/
-.agents/
+# Local scratch files
 task.md
 implementation_plan.md
 walkthrough.md
@@ -45,3 +43,6 @@ walkthrough_v10.md
 # Private backup images folder
 asset/old/
 
+# Local visual QA captures
+assets/screenshots/*
+!assets/screenshots/README.md

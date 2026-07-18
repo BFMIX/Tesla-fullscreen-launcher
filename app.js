@@ -38,10 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
         vibrationEnabled: true,
         longPressDuration: 800, // snappier touch holds
         timeFormat24h: true,
-        theme: 'dark'
+        theme: 'auto'
     };
 
-    let settings = JSON.parse(localStorage.getItem('teslaLauncherSettings_v4')) || {...defaultSettings};
+    function loadSettings() {
+        try {
+            return {
+                ...defaultSettings,
+                ...(JSON.parse(localStorage.getItem('teslaLauncherSettings_v4')) || {})
+            };
+        } catch (e) {
+            return {...defaultSettings};
+        }
+    }
+
+    let settings = loadSettings();
+    const systemThemeQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
 
     // ==========================================================================
     // Helper & Redirection Functions
@@ -125,6 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+    }
+
+    function getResolvedTheme() {
+        if (settings.theme === 'auto') {
+            return systemThemeQuery && systemThemeQuery.matches ? 'light' : 'dark';
+        }
+
+        return settings.theme || 'dark';
     }
 
     /* REVIEW-001 #6 — Request highest practical resolution (256px)
@@ -1032,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const currentTheme = settings.theme || 'dark';
+        const currentTheme = getResolvedTheme();
         if (currentTheme === 'light') {
             document.body.classList.add('light-theme');
         } else {
@@ -1044,6 +1064,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const icon = themeToggle.querySelector('.material-symbols-outlined');
             if (icon) icon.textContent = currentTheme === 'light' ? 'light_mode' : 'dark_mode';
             themeToggle.setAttribute('aria-label', currentTheme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+            themeToggle.title = settings.theme === 'auto'
+                ? `System theme: ${currentTheme}`
+                : `Theme: ${currentTheme}`;
         }
 
         updateClockDisplay();
@@ -1061,14 +1084,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         let hours = now.getHours();
         const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
 
         if (!settings.timeFormat24h) {
             const ampm = hours >= 12 ? ' PM' : ' AM';
             hours = hours % 12;
             hours = hours === 0 ? 12 : hours;
-            clockEl.textContent = `${hours}:${minutes}${ampm}`;
+            clockEl.textContent = `${hours}:${minutes}:${seconds}${ampm}`;
         } else {
-            clockEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes}`;
+            clockEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}`;
         }
 
         const dateEl = document.querySelector('.header-date');
@@ -1111,8 +1135,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             triggerHapticFeedback();
-            settings.theme = (settings.theme || 'dark') === 'dark' ? 'light' : 'dark';
+            settings.theme = getResolvedTheme() === 'dark' ? 'light' : 'dark';
             saveSettings();
+        });
+    }
+
+    if (systemThemeQuery) {
+        systemThemeQuery.addEventListener('change', () => {
+            if (settings.theme === 'auto') {
+                applySettings();
+            }
         });
     }
 
@@ -1153,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
 
     applySettings();
-    setInterval(updateClockDisplay, 10000);
+    setInterval(updateClockDisplay, 1000);
     renderFavorites();
     renderQuickApps();
     updateClearButtonState();

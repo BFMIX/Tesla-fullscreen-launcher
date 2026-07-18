@@ -192,7 +192,7 @@ body {
 
 .header-clock {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-main);
     font-variant-numeric: tabular-nums;
 }
@@ -1366,8 +1366,8 @@ body.light-theme::after {
 }
 
 .header-clock {
-    font-size: 21px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     letter-spacing: 0;
 }
 
