@@ -733,11 +733,17 @@ body {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    width: 100%;
+    width: calc(100% - 32px);
     max-width: 480px;
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
     overflow: hidden;
     animation: modalSlideUp 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guide-modal,
+.settings-modal {
+    max-width: 540px;
+    background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-card) 100%);
 }
 
 @keyframes modalSlideUp {
@@ -772,12 +778,13 @@ body {
     color: var(--text-muted);
     font-size: 28px;
     cursor: pointer;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    margin-right: -6px;
     transition: var(--transition-snappy);
 }
 
@@ -936,21 +943,21 @@ body {
 .help-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    background-color: var(--bg-app);
+    gap: 8px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
     border: 1px solid var(--border-color);
-    padding: 16px;
+    padding: 18px;
     border-radius: var(--radius-md);
 }
 
 .help-item h4 {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-main);
 }
 
 .help-item p {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
     line-height: 1.5;
 }
@@ -980,7 +987,7 @@ body {
 
 .btn-modal-danger {
     width: 100%;
-    height: 48px;
+    min-height: 52px;
     background-color: transparent;
     border: 1px solid var(--color-danger);
     border-radius: var(--radius-sm);
@@ -990,7 +997,6 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition-snappy);
-    margin-top: 10px;
 }
 
 .btn-modal-danger:hover {
@@ -999,11 +1005,17 @@ body {
 }
 
 /* Haptic Settings Control Components */
+.settings-panel-body {
+    padding: 12px 24px 22px;
+}
+
 .settings-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    min-height: 76px;
+    gap: 20px;
+    padding: 18px 0;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -1011,21 +1023,30 @@ body {
     border-bottom: none;
 }
 
+.settings-reset-row {
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    border-bottom: none;
+}
+
 .settings-info {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    max-width: 70%;
+    gap: 5px;
+    max-width: 62%;
 }
 
 .settings-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
+    color: var(--text-main);
 }
 
 .settings-desc {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
+    line-height: 1.35;
 }
 
 /* iOS Toggle Switch */
@@ -1034,6 +1055,7 @@ body {
     display: inline-block;
     width: 48px;
     height: 28px;
+    flex: 0 0 48px;
 }
 
 .switch input {
@@ -1075,6 +1097,26 @@ input:checked + .slider:before {
 }
 
 /* Segmented Control for Clock Format */
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    min-width: 180px;
+}
+
+.slider-container input[type="range"] {
+    width: 132px;
+    accent-color: var(--color-primary);
+}
+
+#long-press-value {
+    min-width: 54px;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: right;
+}
+
 .segmented-control {
     display: flex;
     background-color: var(--bg-app);
@@ -1208,17 +1250,27 @@ input:checked + .slider:before {
    Footer & Legal Disclaimer Section
    ========================================================================== */
 .settings-footer-credits {
-    margin-top: 20px;
+    margin-top: 18px;
     text-align: center;
     border-top: 1px solid var(--border-color);
-    padding-top: 14px;
+    padding-top: 16px;
 }
 
 .settings-credit-text {
     font-size: 12px;
     font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+.settings-credit-text span {
+    color: var(--color-primary);
+}
+
+.settings-credit-subtext {
+    font-size: 11px;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 
 .settings-disclaimer-text {
@@ -1233,7 +1285,7 @@ input:checked + .slider:before {
    Home Screen V1 - Validated Tesla HMI
    ========================================================================== */
 :root {
-    --bg-app: #05070B;
+    --bg-app: #080B12;
     --bg-surface: rgba(14, 17, 24, 0.76);
     --bg-surface-strong: rgba(10, 12, 18, 0.92);
     --border-color: rgba(255, 255, 255, 0.14);
@@ -1254,11 +1306,11 @@ input:checked + .slider:before {
 /* REVIEW-001 #2 — Light theme: premium warm grey foundation, stronger
    card separation, reinforced borders and desaturated background. */
 body.light-theme {
-    --bg-app: #E4E7EC;
-    --bg-surface: rgba(255, 255, 255, 0.82);
+    --bg-app: #DDE2EA;
+    --bg-surface: rgba(255, 255, 255, 0.84);
     --bg-surface-strong: rgba(255, 255, 255, 0.94);
-    --border-color: rgba(17, 20, 28, 0.16);
-    --border-soft: rgba(17, 20, 28, 0.10);
+    --border-color: rgba(17, 20, 28, 0.18);
+    --border-soft: rgba(17, 20, 28, 0.12);
     --text-main: #111318;
     --text-muted: #4E545E;
     --text-dark: #6E7580;
@@ -1274,8 +1326,8 @@ body {
 
 body {
     background:
-        radial-gradient(ellipse at 50% 38%, rgba(37, 43, 57, 0.42) 0%, rgba(6, 8, 13, 0.72) 34%, rgba(2, 4, 8, 0.98) 78%),
-        linear-gradient(160deg, rgba(3, 5, 9, 0.96) 0%, rgba(12, 15, 24, 0.92) 44%, rgba(3, 5, 8, 0.98) 100%);
+        radial-gradient(ellipse at 50% 38%, rgba(48, 56, 74, 0.48) 0%, rgba(10, 13, 22, 0.70) 38%, rgba(5, 7, 12, 0.96) 82%),
+        linear-gradient(160deg, rgba(7, 10, 17, 0.96) 0%, rgba(15, 19, 30, 0.92) 44%, rgba(6, 8, 14, 0.98) 100%);
 }
 
 body::before,
@@ -1291,24 +1343,25 @@ body::after {
    Shapes stay atmospheric but never compete with cards or text. */
 body::before {
     background:
-        linear-gradient(150deg, transparent 0 18%, rgba(21, 26, 37, 0.38) 18.2% 28%, transparent 28.2%),
-        linear-gradient(28deg, transparent 0 18%, rgba(16, 20, 29, 0.42) 18.3% 32%, transparent 32.2%),
-        radial-gradient(ellipse at 52% 36%, rgba(232, 33, 39, 0.06), transparent 32%),
-        radial-gradient(ellipse at 86% 52%, rgba(232, 33, 39, 0.07), transparent 24%);
-    opacity: 0.7;
+        linear-gradient(150deg, transparent 0 18%, rgba(31, 38, 54, 0.34) 18.2% 28%, transparent 28.2%),
+        linear-gradient(28deg, transparent 0 18%, rgba(24, 30, 43, 0.36) 18.3% 32%, transparent 32.2%),
+        radial-gradient(ellipse at 52% 36%, rgba(232, 33, 39, 0.065), transparent 32%),
+        radial-gradient(ellipse at 86% 52%, rgba(232, 33, 39, 0.075), transparent 24%);
+    opacity: 0.74;
 }
 
 body::after {
     background:
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.34), transparent 26%, rgba(0, 0, 0, 0.44) 100%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.18), transparent 28%, rgba(0, 0, 0, 0.28) 100%),
         repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 4px);
 }
 
 /* REVIEW-001 #2 — Desaturated and darkened light-theme background artwork */
 body.light-theme {
     background:
-        radial-gradient(ellipse at 52% 42%, rgba(240, 242, 246, 0.9) 0%, rgba(224, 228, 236, 0.78) 38%, rgba(210, 216, 226, 0.92) 100%),
-        linear-gradient(155deg, #DFE3EA 0%, #EBEEF3 48%, #D6DBE2 100%);
+        radial-gradient(ellipse at 50% 38%, rgba(255, 255, 255, 0.86) 0%, rgba(229, 235, 244, 0.74) 34%, rgba(198, 208, 222, 0.92) 84%),
+        radial-gradient(ellipse at 50% 42%, rgba(232, 236, 243, 0.94) 0%, rgba(218, 224, 234, 0.84) 42%, rgba(200, 208, 220, 0.94) 100%),
+        linear-gradient(155deg, #D6DCE6 0%, #E7EAF0 48%, #CCD4DF 100%);
 }
 
 /* REVIEW-001 #2 — Reduced light-theme geometric contrast */
@@ -1316,11 +1369,14 @@ body.light-theme::before {
     background:
         linear-gradient(150deg, transparent 0 17%, rgba(190, 198, 212, 0.52) 17.3% 31%, transparent 31.2%),
         linear-gradient(28deg, transparent 0 18%, rgba(198, 206, 218, 0.56) 18.3% 34%, transparent 34.2%),
+        radial-gradient(ellipse at 52% 36%, rgba(255, 255, 255, 0.54), transparent 30%),
         radial-gradient(ellipse at 86% 55%, rgba(232, 33, 39, 0.06), transparent 28%);
 }
 
 body.light-theme::after {
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), transparent 30%, rgba(255, 255, 255, 0.2) 100%);
+    background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08), transparent 32%, rgba(255, 255, 255, 0.16) 100%),
+        repeating-linear-gradient(90deg, rgba(17, 20, 28, 0.018) 0 1px, transparent 1px 4px);
 }
 
 .app-container {
@@ -1431,20 +1487,31 @@ body.light-theme::after {
 }
 
 .home-logo-container {
-    height: 116px;
-    overflow: hidden;
+    height: 170px;
+    overflow: visible;
 }
 
 .home-logo {
-    max-width: 508px;
-    width: 52vw;
-    transform: translateY(-2px);
+    display: block;
+    width: auto;
+    height: 170px;
+    max-width: 62vw;
+    object-fit: contain;
+    transform: translateY(0);
     filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
 }
 
+.home-logo-light,
+body.light-theme .home-logo-dark {
+    display: none;
+}
+
+body.light-theme .home-logo-light {
+    display: block;
+}
+
 body.light-theme .home-logo {
-    filter: invert(1) hue-rotate(180deg) brightness(0.2) drop-shadow(0 5px 14px rgba(255, 255, 255, 0.22));
-    mix-blend-mode: multiply;
+    filter: drop-shadow(0 5px 14px rgba(255, 255, 255, 0.22));
 }
 
 .console-input-wrapper {
@@ -1601,9 +1668,9 @@ body.light-theme .smart-card:hover {
 /* REVIEW-001 #2 — Stronger card separation on light theme */
 body.light-theme .quick-app-btn,
 body.light-theme .smart-card {
-    background: rgba(255, 255, 255, 0.82);
-    border-color: rgba(17, 20, 28, 0.13);
-    box-shadow: 0 4px 16px rgba(40, 52, 72, 0.10);
+    background: rgba(255, 255, 255, 0.86);
+    border-color: rgba(17, 20, 28, 0.16);
+    box-shadow: 0 5px 18px rgba(40, 52, 72, 0.12);
 }
 
 .quick-app-btn img {
@@ -1792,3 +1859,81 @@ body.light-theme .edit-favorites-btn {
         width: 198px;
     }
 }
+
+/* Shared branding and theme-aware wordmark. */
+.launcher-emblem {
+    display: block;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+.launcher-emblem-loading { width: 104px; height: 104px; margin: auto; }
+.redirect-logo-wrapper {
+    width: 104px;
+    height: 104px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+.home-wordmark { width: 460px; max-width: 100%; display: flex; flex-direction: column; gap: 18px; }
+.wordmark-tesla, .wordmark-launcher {
+    display: block;
+    width: 100%;
+    -webkit-mask-image: var(--home-wordmark-mask);
+    mask-image: var(--home-wordmark-mask);
+    -webkit-mask-size: 100% auto;
+    mask-size: 100% auto;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+.wordmark-tesla {
+    padding-top: 12%;
+    background: linear-gradient(to right, #ff4650 0%, #e82127 45%, #b90f23 100%);
+    -webkit-mask-position: center 43%;
+    mask-position: center 43%;
+}
+.wordmark-launcher {
+    padding-top: 4.6%;
+    background: linear-gradient(to right, #ffffff, #b3bac6);
+    -webkit-mask-position: center 76%;
+    mask-position: center 76%;
+}
+body.light-theme .wordmark-launcher { background: linear-gradient(to right, #171a20, #626a76); }
+
+/* Reserve the footer's full touch area so it never covers the last row. */
+html, body { min-height: 100%; height: 100%; overflow: hidden; }
+body { display: block; }
+.app-container { height: calc(100vh - 48px); min-height: 0; margin: 0 auto; padding-bottom: 12px; }
+.app-main { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+.app-main > section { flex-shrink: 0; }
+.app-footer {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 20;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 64px;
+    box-sizing: border-box;
+    justify-content: center;
+    background: var(--bg-app);
+    border-top: 1px solid var(--border-soft);
+}
+.footer-credit { flex-wrap: nowrap; gap: 7px; font-size: 12px; line-height: 16px; }
+.footer-heart { font-size: 16px; }
+.footer-divider { height: 16px; margin: 0 6px; }
+.footer-info-btn { right: 12px; top: 0; width: 48px; height: 48px; }
+@media (max-width: 700px) {
+    .home-wordmark { width: 360px; gap: 14px; }
+    .app-main { min-height: 0; }
+    .app-container { padding-bottom: 12px; }
+    .app-footer { padding: 0 60px 0 12px; justify-content: flex-start; }
+    .footer-credit { flex-wrap: wrap; gap: 3px 5px; font-size: 10px; }
+    .footer-credit > span:last-child { flex-basis: 100%; }
+    .footer-divider { display: none; }
+}
+
+
+
+.home-logo-container { display: flex; align-items: center; justify-content: center; }

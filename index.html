@@ -8,16 +8,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600&family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="asset/home-wordmark.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="asset/icon.png" type="image/png">
-    <link rel="apple-touch-icon" href="asset/icon.png" sizes="180x180">
+    <link rel="icon" href="asset/favicon.png" type="image/png" sizes="64x64">
+    <link rel="apple-touch-icon" href="asset/apple-touch-icon.png" sizes="180x180">
 </head>
 <body>
     <div class="app-container">
         <!-- HEADER -->
         <header class="app-header">
             <div class="header-left">
-                <div class="tesla-mark" aria-label="Tesla">T</div>
+                <img class="launcher-emblem" src="asset/icon.png" alt="Tesla Fullscreen Launcher" width="56" height="56">
             </div>
             <div class="header-center">
                 <span class="material-symbols-outlined header-time-icon">schedule</span>
@@ -42,11 +43,11 @@
         <main class="app-main">
             <!-- INPUT CONSOLE -->
             <section class="console-section">
-                <div class="home-logo-container">
-                <!-- TODO: Replace this cropped raster asset with a dedicated
-                     transparent wordmark SVG (text only, no slogan).
-                     The final asset will come from assets/02_logos/. -->
-                <img src="asset/home-logo.png" alt="Tesla Launcher Logo" class="home-logo">
+                <div class="home-logo-container" role="img" aria-label="Tesla Fullscreen Launcher">
+                    <div class="home-wordmark">
+                        <span class="wordmark-tesla" aria-hidden="true"></span>
+                        <span class="wordmark-launcher" aria-hidden="true"></span>
+                    </div>
                 </div>
                 <div class="console-input-wrapper">
                     <span class="material-symbols-outlined launcher-link-icon">link</span>
@@ -89,7 +90,7 @@
             <div class="footer-credit">
                 <span>Made with</span>
                 <span class="footer-heart">♥</span>
-                <span>by <strong>BFMIX</strong></span>
+                <span>by <strong>BFMIX LABS</strong></span>
                 <span class="footer-divider"></span>
                 <span>A Tesla Owner for Tesla Owners</span>
             </div>
@@ -103,7 +104,7 @@
     <div id="view-redirect" class="redirect-screen hidden">
         <div class="redirect-content">
             <div class="redirect-logo-wrapper">
-                <div class="monogram-logo">TF</div>
+                <img class="launcher-emblem launcher-emblem-loading" src="asset/icon.png" alt="Tesla Fullscreen Launcher" width="104" height="104">
             </div>
             <h2 class="redirect-title">Optimizing Viewport...</h2>
             <p class="redirect-subtitle">Launching in Fullscreen Mode</p>
@@ -210,7 +211,7 @@
 
     <!-- HELP MODAL -->
     <div id="modal-help" class="modal-overlay hidden">
-        <div class="modal-content">
+        <div class="modal-content guide-modal">
             <div class="modal-header">
                 <span class="modal-title">Help & Connection Guide</span>
                 <button class="modal-close" id="btn-close-help">
@@ -232,7 +233,7 @@
                 </div>
                 <div class="help-item">
                     <h4>Which mode should I use?</h4>
-                    <p>Use Quick Apps for the fastest Tesla-first flow. Use the URL field only when you want to launch a custom website.</p>
+                    <p>Use Quick Apps for the fastest Tesla-first flow. Use the URL field when you want to open a custom media website or direct link.</p>
                 </div>
             </div>
         </div>
@@ -275,14 +276,14 @@
 
     <!-- SETTINGS MODAL -->
     <div id="modal-settings" class="modal-overlay hidden">
-        <div class="modal-content">
+        <div class="modal-content settings-modal">
             <div class="modal-header">
                 <span class="modal-title">Settings</span>
                 <button class="modal-close" id="btn-close-settings">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body settings-panel-body">
                 <div class="settings-row">
                     <div class="settings-info">
                         <span class="settings-name">Haptic Feedback</span>
@@ -313,13 +314,13 @@
                         <button type="button" class="segment-btn" data-value="12h">12h</button>
                     </div>
                 </div>
-                <div class="settings-row" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <div class="settings-row settings-reset-row">
                     <button id="btn-reset-settings" class="btn-modal-danger">RESET SETTINGS</button>
                 </div>
-                <!-- Settings Footer Credits & Disclaimer -->
                 <div class="settings-footer-credits">
-                    <p class="settings-credit-text">Made with ❤️ by <strong>BFMIX</strong> (A Tesla Owner for Tesla Owners)</p>
-                    <p class="settings-disclaimer-text">Disclaimer: This launcher is an independent community project and is not affiliated with, sponsored by, or endorsed by Tesla, Inc. "Tesla" is a registered trademark of Tesla, Inc.</p>
+                    <p class="settings-credit-text">Made with <span aria-hidden="true">❤️</span> by <strong>BFMIX LABS</strong></p>
+                    <p class="settings-credit-subtext">A Tesla Owner for Tesla Owners</p>
+                    <p class="settings-disclaimer-text">Tesla Fullscreen Launcher is an independent community project created by a Tesla owner for Tesla owners. It is not affiliated with, sponsored by, or endorsed by Tesla, Inc. TESLA is a registered trademark of Tesla, Inc.</p>
                 </div>
             </div>
         </div>

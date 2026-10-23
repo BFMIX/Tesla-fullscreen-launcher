@@ -46,3 +46,10 @@ asset/old/
 # Local visual QA captures
 assets/screenshots/*
 !assets/screenshots/README.md
+
+# Local exports and archived design drafts
+assets/archive/design-assets/
+*.psd
+test-results/
+playwright-report/
+.playwright/
