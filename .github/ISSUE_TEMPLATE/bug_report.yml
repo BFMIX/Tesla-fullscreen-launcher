@@ -1,0 +1,40 @@
+name: Report a problem
+description: Tell us what went wrong on your Tesla or in your browser.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Please leave out passwords, account details, private links and vehicle identification numbers."
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we reproduce it?
+      placeholder: "1. Open the launcher\n2. Tap ...\n3. The screen shows ..."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Vehicle and software
+      description: Tesla model, software version and MCU if known. For browser-only testing, name the browser and device.
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      options:
+        - Dark
+        - Light
+        - Both
+        - Not sure
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Optional screenshot or public website address. Remove personal information first.

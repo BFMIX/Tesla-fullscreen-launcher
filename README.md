@@ -1,204 +1,81 @@
-# 🚗 Tesla Fullscreen Launcher
+<p align="center">
+  <img src="asset/icon.png" alt="Tesla Fullscreen Launcher app icon" width="104" height="104">
+</p>
 
-> **The easiest way to launch media websites in fullscreen on your Tesla.**
+# Tesla Fullscreen Launcher
 
-Tesla Fullscreen Launcher is a lightweight, open-source web application built specifically for Tesla's in-car browser.
+**Your favorite streaming platforms and social networks, together on your Tesla screen. Launch in fullscreen with a simple tap and enjoy a Tesla-style experience.**
 
-It provides a simple, touch-friendly launcher that helps you open your favorite media websites while preserving the best fullscreen experience currently possible on Tesla vehicles.
+[**Open Launcher**](https://bfmix.github.io/Tesla-fullscreen-launcher/) · [Report a Problem](https://github.com/BFMIX/Tesla-fullscreen-launcher/issues/new?template=bug_report.yml) · [Share an Idea](https://github.com/BFMIX/Tesla-fullscreen-launcher/issues/new?template=idea.yml)
 
-Designed for Tesla owners.
+Made by **BFMIX LABS**, a Tesla owner building for Tesla owners.
 
-Built for speed.
+## Start on Your Tesla
 
-Made for fullscreen.
+1. While parked, open your Tesla's browser and visit **[bfmix.github.io/Tesla-fullscreen-launcher](https://bfmix.github.io/Tesla-fullscreen-launcher/)**.
+2. Tap a Quick App or enter the address of a website you want to open.
+3. Add the launcher to your browser favorites for your next stop.
 
----
+No installation or launcher account required. An internet connection is needed.
 
-## ✨ Why Tesla Fullscreen Launcher?
+## Your Next Charging Stop, Upgraded
 
-Tesla's browser is surprisingly capable, but accessing media websites quickly and comfortably can still be frustrating.
+| What you want | What the launcher offers |
+| --- | --- |
+| Open a favorite service quickly | Large Quick App cards made for touch |
+| Visit something different | A field for your own website address |
+| Return to a recent website | Last Opened shortcuts |
+| Match your screen | Dark and Light themes, with automatic selection where supported |
+| Keep your setup | Apps and preferences saved in the same browser |
 
-Tesla Fullscreen Launcher removes that friction by providing a clean interface optimized for the Tesla touchscreen.
+Quick Apps include shortcuts to YouTube, Netflix, Disney+, Prime Video, HBO Max, Plex, Apple TV and Paramount+. You can also add links to your favorite social networks and other websites.
 
-No clutter.
+## Before You Launch
 
-No complicated setup.
+**Does every website work in fullscreen?**
 
-Just open, launch and enjoy.
+Fullscreen behavior and playback depend on the website, vehicle software and Tesla browser. The launcher provides fullscreen launch options; it cannot guarantee that every service will open or play correctly.
 
----
+**Do I need a streaming subscription?**
 
-## 🚀 Features
+If a service requires a subscription or sign-in, you still need your own account. The launcher opens websites and does not provide subscriptions or media content.
 
-### 🎬 One-Tap Fullscreen Launch
+**Can I use it while driving?**
 
-Launch your favorite websites with a single tap.
+Use the launcher and entertainment websites only while parked. Vehicle restrictions still apply.
 
-The launcher automatically applies the best available fullscreen strategy for supported services.
+**Will it remember my apps and theme?**
 
----
+Your launcher preferences and saved links stay in the browser where you use them. Clearing browser data may remove them. They do not sync between vehicles or devices.
 
-### 🚗 Designed for Tesla
+**What about privacy?**
 
-Built specifically for Tesla's landscape display.
+The launcher stores its settings and saved links locally and has no built-in analytics. It loads fonts and website icons from external providers. Websites you open have their own privacy policies and sign-in requirements.
 
-* Large touch targets
-* Single screen interface
-* No scrolling
-* Optimized for MCU2 (Intel Atom)
-* Fast and lightweight
+**How can I fix a connection or launch problem?**
 
----
+Start with **Help & Connection Guide** inside the launcher. If the problem continues, [send a report](https://github.com/BFMIX/Tesla-fullscreen-launcher/issues/new?template=bug_report.yml) with your vehicle software version and the steps that failed. Please leave out account details and private links.
 
-### ⭐ Favorites & Recent Activity
+## Help the Project Grow
 
-Quickly reopen your favorite services.
+Enjoying the launcher? **Give the repository a Star** so you can find it again, and share the launcher link with another Tesla owner.
 
-The launcher remembers:
+Real-world feedback is especially helpful: tell us what works on your Tesla, report a problem, or suggest a small improvement. You do not need to write code to contribute.
 
-* Recently opened websites
-* Favorite services
-* Previous URLs
+[**Support BFMIX LABS on Ko-fi**](https://ko-fi.com/bfmix) to help support the launcher's continued development. Contributions are optional; the launcher remains free to use.
 
-Everything is stored locally inside your Tesla browser.
-
----
-
-### 🔒 Login Sessions Preserved
-
-Your existing logins remain intact.
-
-Netflix, Plex, Disney+, Twitch and other supported websites continue using your normal browser session without requiring additional authentication whenever possible.
-
-No accounts.
-
-No cloud.
-
-No synchronization.
+[Report a problem](https://github.com/BFMIX/Tesla-fullscreen-launcher/issues/new?template=bug_report.yml) · [Suggest an improvement](https://github.com/BFMIX/Tesla-fullscreen-launcher/issues/new?template=idea.yml) · [Contribute](CONTRIBUTING.md)
 
 ---
 
-### 🔐 Privacy First
+Tesla Fullscreen Launcher is an independent community project. It is not affiliated with, sponsored by, or endorsed by Tesla, Inc. Tesla and the names of other services belong to their respective owners.
 
-Tesla Fullscreen Launcher is entirely client-side.
+## For Developers
 
-* No servers
-* No database
-* No analytics
-* No tracking
-* No personal data collection
+The launcher uses HTML, CSS and vanilla JavaScript, hosted on GitHub Pages. It has no build step or application backend. Performance on Tesla MCU2 is a priority.
 
-Your browsing data never leaves your browser.
+Clone this repository and open `index.html` in a browser. A local static server can also be used.
 
----
+Keep contributions focused on the approved product direction: a simple, touch-first launcher. Discuss feature additions and visual changes before implementation. See [CONTRIBUTING.md](CONTRIBUTING.md) for testing and pull request guidance.
 
-## ⚡ One-Tap Launch URLs
-
-You can launch a website directly without opening the home screen.
-
-Simply use:
-
-```text
-https://bfmix.github.io/Tesla-fullscreen-launcher/?launch=https://example.com
-```
-
-Examples:
-
-Netflix
-
-```text
-https://bfmix.github.io/Tesla-fullscreen-launcher/?launch=https://www.netflix.com
-```
-
-Plex
-
-```text
-https://bfmix.github.io/Tesla-fullscreen-launcher/?launch=https://app.plex.tv/desktop
-```
-
-Disney+
-
-```text
-https://bfmix.github.io/Tesla-fullscreen-launcher/?launch=https://www.disneyplus.com
-```
-
-Perfect for Tesla bookmarks.
-
----
-
-## 📱 Optimized Experience
-
-Tesla Fullscreen Launcher has been carefully designed for the in-car experience.
-
-✔ Single Page Application
-
-✔ Large touch controls
-
-✔ Minimal interface
-
-✔ Dark mode
-
-✔ No scrolling
-
-✔ Fast loading
-
-✔ Mobile-friendly
-
----
-
-## 🌍 Live Demo
-
-https://bfmix.github.io/Tesla-fullscreen-launcher/
-
----
-
-## ❤️ Open Source
-
-Tesla Fullscreen Launcher is completely open source.
-
-Contributions, ideas and feedback are always welcome.
-
-If you enjoy the project, consider giving it a ⭐ on GitHub.
-
----
-
-# 👨💻 Developer Notes
-
-## Technology
-
-* Vanilla JavaScript
-* HTML5
-* CSS3
-* Single Page Application (SPA)
-* GitHub Pages
-* 100% Client-Side
-
-No frameworks.
-
-No backend.
-
-No build system.
-
-No external dependencies.
-
-Designed to remain extremely lightweight for Tesla's embedded Chromium browser.
-
----
-
-## Project Goals
-
-* Deliver the best fullscreen launcher experience for Tesla owners.
-* Keep the project simple.
-* Maintain excellent performance on Intel MCU2 vehicles.
-* Remain fully open source.
-* Never require a backend or user accounts.
-
----
-
-## Disclaimer
-
-Tesla Fullscreen Launcher is an independent community project.
-
-It is **not affiliated with, endorsed by, or sponsored by Tesla, Inc.**
-
-Tesla is a trademark of Tesla, Inc.
+The code is available under the [MIT License](LICENSE). Third-party names, trademarks and assets remain subject to their respective owners' rights.

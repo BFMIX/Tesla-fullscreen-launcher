@@ -1,0 +1,18 @@
+name: Suggest an improvement
+description: Share a small improvement to the Tesla launcher experience.
+title: "[Idea]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to make easier?
+      description: Describe a specific situation when using the launcher.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Your suggestion
+      description: How would this help Tesla owners while keeping the launcher simple?
+    validations:
+      required: true
