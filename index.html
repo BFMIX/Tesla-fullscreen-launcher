@@ -51,7 +51,7 @@
                 </div>
                 <div class="console-input-wrapper">
                     <span class="material-symbols-outlined launcher-link-icon">link</span>
-                    <input type="text" id="url-input" placeholder="Just paste your URL/link" autocomplete="off" spellcheck="false">
+                    <input type="text" id="url-input" placeholder="Enter a website address" aria-label="Website address" autocomplete="off" spellcheck="false">
                     <button id="clear-btn" class="clear-btn-overlay">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -66,7 +66,10 @@
             <section class="quick-apps-section">
                 <div class="section-header">
                     <span class="section-title">Quick Apps</span>
-                    <button id="btn-edit-quick-apps" class="edit-favorites-btn">Edit</button>
+                    <div class="section-actions">
+                        <button id="btn-show-all-apps" class="show-all-btn" type="button" aria-haspopup="dialog" aria-controls="modal-all-apps">Show All</button>
+                        <button id="btn-edit-quick-apps" class="edit-favorites-btn" type="button">Edit</button>
+                    </div>
                 </div>
                 <div id="quick-apps-grid" class="quick-apps-grid">
                     <!-- Dynamic Quick Apps Populated by JS -->
@@ -116,6 +119,20 @@
     </div>
 
     <!-- MODALS OVERLAYS -->
+    <div id="modal-all-apps" class="modal-overlay hidden">
+        <div class="modal-content apps-folder" role="dialog" aria-modal="true" aria-labelledby="all-apps-title" tabindex="-1">
+            <div class="modal-header">
+                <span class="modal-title" id="all-apps-title">All Apps</span>
+                <div class="section-actions">
+                    <button id="btn-edit-all-apps" class="edit-favorites-btn" type="button">Edit</button>
+                    <button class="modal-close" id="btn-close-all-apps" type="button" aria-label="Close All Apps">
+                        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                    </button>
+                </div>
+            </div>
+            <div id="all-apps-grid" class="all-apps-grid"></div>
+        </div>
+    </div>
     <!-- ADD/EDIT FAVORITE / QUICK APP MODAL -->
     <div id="modal-add-favorite" class="modal-overlay hidden">
         <div class="modal-content">
@@ -235,41 +252,6 @@
                     <h4>Which mode should I use?</h4>
                     <p>Use Quick Apps for the fastest Tesla-first flow. Use the URL field when you want to open a custom media website or direct link.</p>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- IPTV SELECTOR MODAL -->
-    <div id="modal-iptv-selector" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-title">Select IPTV Web Player</span>
-                <button class="modal-close" id="btn-close-iptv">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            <div class="modal-actions-list">
-                <button class="modal-action-row iptv-choice-btn" data-url="https://evstream.app/">
-                    <img src="https://www.google.com/s2/favicons?domain=evstream.app&sz=64" class="modal-action-favicon-img" alt="EVStream">
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">EVStream</span>
-                        <span class="modal-action-desc">Sleek Web player for IPTV playlists</span>
-                    </div>
-                </button>
-                <button class="modal-action-row iptv-choice-btn" data-url="https://pleyr.net">
-                    <img src="https://www.google.com/s2/favicons?domain=pleyr.net&sz=64" class="modal-action-favicon-img" alt="Pleyr">
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">Pleyr</span>
-                        <span class="modal-action-desc">Fast HTML5 IPTV streaming portal</span>
-                    </div>
-                </button>
-                <button class="modal-action-row iptv-choice-btn" data-url="http://webtv.iptvsmarters.com/">
-                    <img src="https://www.google.com/s2/favicons?domain=webtv.iptvsmarters.com&sz=64" class="modal-action-favicon-img" alt="IPTV Smarters">
-                    <div class="modal-action-details">
-                        <span class="modal-action-name">IPTV Smarters</span>
-                        <span class="modal-action-desc">Classic Smarters Web TV dashboard</span>
-                    </div>
-                </button>
             </div>
         </div>
     </div>

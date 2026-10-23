@@ -1937,3 +1937,101 @@ body { display: block; }
 
 
 .home-logo-container { display: flex; align-items: center; justify-content: center; }
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.section-actions .edit-favorites-btn,
+.apps-folder .modal-close {
+    min-width: 48px;
+    min-height: 48px;
+}
+
+.show-all-btn {
+    min-height: 48px;
+    padding: 8px 14px;
+    border: 0;
+    background: transparent;
+    color: var(--text-main);
+    font: inherit;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+#modal-all-apps {
+    backdrop-filter: none;
+}
+
+.apps-folder {
+    width: calc(100% - 48px);
+    max-width: 1060px;
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    animation: none;
+    background: #111318;
+}
+
+.apps-folder:focus { outline: none; }
+
+body.light-theme .apps-folder { background: #f4f5f7; }
+
+.apps-folder .modal-header {
+    flex-shrink: 0;
+}
+
+.all-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    padding: 24px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    min-height: 0;
+}
+
+.all-apps-grid .quick-app-btn {
+    width: 100%;
+    min-width: 0;
+    height: 148px;
+    gap: 18px;
+    border-radius: 8px;
+    padding: 16px 8px;
+    font-size: 16px;
+}
+
+.all-apps-grid .quick-app-btn > span:last-child {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.all-apps-grid .quick-app-btn img {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+}
+
+.all-apps-grid .card-delete-badge {
+    width: 48px;
+    height: 48px;
+    top: 0;
+    right: 0;
+}
+
+.show-all-btn:focus-visible,
+.apps-folder button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -3px;
+}
+
+@media (max-width: 600px) {
+    .section-actions { gap: 0; }
+    .show-all-btn, .section-actions .edit-favorites-btn { font-size: 15px; padding: 8px; }
+    .apps-folder { width: calc(100% - 24px); max-height: calc(100vh - 24px); }
+    .all-apps-grid { gap: 12px; padding: 16px; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); }
+}

@@ -23,7 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'qa-hbo', name: 'HBO Max', url: 'https://www.max.com', icon: 'globe', lastOpened: 0 },
         { id: 'qa-plex', name: 'Plex', url: 'https://app.plex.tv/desktop', icon: 'globe', lastOpened: 0 },
         { id: 'qa-apple', name: 'Apple TV', url: 'https://tv.apple.com', icon: 'globe', lastOpened: 0 },
-        { id: 'qa-paramount', name: 'Paramount+', url: 'https://www.paramountplus.com', icon: 'globe', lastOpened: 0 }
+        { id: 'qa-paramount', name: 'Paramount+', url: 'https://www.paramountplus.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-twitch', name: 'Twitch', url: 'https://www.twitch.tv', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-hulu', name: 'Hulu', url: 'https://www.hulu.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-peacock', name: 'Peacock', url: 'https://www.peacocktv.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-crunchyroll', name: 'Crunchyroll', url: 'https://www.crunchyroll.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-canal', name: 'Canal+', url: 'https://www.canalplus.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-arte', name: 'ARTE', url: 'https://www.arte.tv', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-francetv', name: 'France.tv', url: 'https://www.france.tv', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-pluto', name: 'Pluto TV', url: 'https://pluto.tv', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-instagram', name: 'Instagram', url: 'https://www.instagram.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-tiktok', name: 'TikTok', url: 'https://www.tiktok.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-reddit', name: 'Reddit', url: 'https://www.reddit.com', icon: 'globe', lastOpened: 0 },
+        { id: 'qa-tvium', name: 'IPTV (Tvium)', url: 'https://bfmix.github.io/Tvium/', icon: 'globe', lastOpened: 0 }
     ];
 
     let selectedItem = null;
@@ -151,7 +163,11 @@ document.addEventListener('DOMContentLoaded', () => {
        and provide lightweight onerror fallback chain. */
     function getFaviconUrl(url) {
         try {
-            const hostname = new URL(normalizeUrl(url)).hostname;
+            const parsedUrl = new URL(normalizeUrl(url));
+            if (parsedUrl.hostname === 'bfmix.github.io' && /^\/Tvium(?:\/|$)/.test(parsedUrl.pathname)) {
+                return 'https://bfmix.github.io/Tvium/icons/Icon-192.png';
+            }
+            const hostname = parsedUrl.hostname;
             return `https://www.google.com/s2/favicons?domain=${hostname}&sz=256`;
         } catch (e) {
             return 'asset/icon.png';
@@ -379,11 +395,23 @@ document.addEventListener('DOMContentLoaded', () => {
             appsList = [...DEFAULT_QUICK_APPS];
         }
         
-        // Enforce: IPTV is always last in the list
-        const iptvIndex = appsList.findIndex(a => a.id === 'qa-iptv');
-        if (iptvIndex > -1) {
-            const iptvItem = appsList.splice(iptvIndex, 1)[0];
-            appsList.push(iptvItem);
+        // Add the expanded catalog once, preserving saved order and later removals.
+        if (!localStorage.getItem('tesla_launcher_catalog_v7')) {
+            appsList = appsList.map(app => app.id === 'qa-iptv'
+                ? { ...app, id: 'qa-tvium', name: 'IPTV (Tvium)', url: 'https://bfmix.github.io/Tvium/', lastUrl: undefined }
+                : app);
+            DEFAULT_QUICK_APPS.slice(8).forEach(app => {
+                if (!appsList.some(saved => saved.id === app.id || saved.url.replace(/\/$/, '') === app.url.replace(/\/$/, ''))) {
+                    appsList.push({ ...app });
+                }
+            });
+            localStorage.setItem(appsKeyV6, JSON.stringify(appsList));
+            localStorage.setItem('tesla_launcher_catalog_v7', '1');
+        }
+        const tvium = appsList.find(app => app.id === 'qa-tvium' && app.name === 'Tvium');
+        if (tvium) {
+            tvium.name = 'IPTV (Tvium)';
+            localStorage.setItem(appsKeyV6, JSON.stringify(appsList));
         }
         return appsList;
     }
@@ -541,11 +569,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Quick Apps Dynamic Render ---
     function renderQuickApps() {
-        const grid = document.getElementById('quick-apps-grid');
+        const apps = getQuickApps();
+        renderQuickAppsGrid('quick-apps-grid', apps.slice(0, 8));
+        renderQuickAppsGrid('all-apps-grid', apps);
+    }
+
+    function renderQuickAppsGrid(gridId, apps) {
+        const grid = document.getElementById(gridId);
         if (!grid) return;
         grid.innerHTML = '';
-
-        const apps = getQuickApps();
 
         apps.forEach(app => {
             const btn = document.createElement('button');
@@ -554,10 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const faviconUrl = getFaviconUrl(app.url);
 
-            let iconHtml = `<img src="${faviconUrl}" onerror="faviconFallback(this)" alt="${escapeHtml(app.name)}">`;
-            if (app.id === 'qa-iptv') {
-                iconHtml = `<span class="material-symbols-outlined quick-app-symbol">tv</span>`;
-            }
+            const iconHtml = `<img src="${faviconUrl}" loading="lazy" decoding="async" onerror="faviconFallback(this)" alt="">`;
 
             btn.innerHTML = `
                 <span class="card-delete-badge" role="button" aria-label="Delete">&times;</span>
@@ -567,22 +596,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Delete badge triggers in edit mode
             const delBtn = btn.querySelector('.card-delete-badge');
-            if (app.id === 'qa-iptv') {
-                delBtn.style.display = 'none';
-            } else if (editModeQuickApps) {
+            delBtn.setAttribute('aria-label', `Remove ${app.name}`);
+            if (editModeQuickApps) {
                 delBtn.style.display = 'flex';
+                delBtn.tabIndex = 0;
             }
             
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (app.id === 'qa-iptv') return;
                 if (confirm(`Remove Quick App ${app.name}?`)) {
                     let updatedApps = getQuickApps().filter(a => a.id !== app.id);
                     saveQuickApps(updatedApps);
                 }
             });
 
+            delBtn.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    delBtn.click();
+                }
+            });
+
             setupCardInteraction(btn, app, false, true);
+            btn.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    launch(app.lastUrl || app.url, app.launchMode || 'optimized');
+                }
+            });
             grid.appendChild(btn);
         });
 
@@ -614,7 +656,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startPress = (e) => {
             if (e.target.closest('.card-delete-badge')) return;
-            if (item.id === 'qa-iptv') return; // Enforce no long-press options for IPTV
             isLongPress = false;
             isScrolling = false;
             pressTimer = setTimeout(() => {
@@ -636,10 +677,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!isLongPress) {
                 triggerHapticFeedback();
-                if (item.id === 'qa-iptv') {
-                    openModal('modal-iptv-selector');
-                    return;
-                }
                 // Launch last URL context if saved, otherwise default url
                 const targetUrl = item.lastUrl || item.url;
                 launch(targetUrl, item.launchMode || 'optimized');
@@ -660,6 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
 
     function openModal(id) {
+        if (id !== 'modal-all-apps') closeModal('modal-all-apps');
         const modal = document.getElementById(id);
         if (modal) {
             modal.classList.remove('hidden');
@@ -669,6 +707,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal(id) {
         const modal = document.getElementById(id);
         if (modal) {
+            if (id === 'modal-all-apps' && modal.contains(document.activeElement)) {
+                document.getElementById('btn-show-all-apps').focus();
+            }
             modal.classList.add('hidden');
         }
     }
@@ -678,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             triggerHapticFeedback();
             const modal = btn.closest('.modal-overlay');
-            if (modal) modal.classList.add('hidden');
+            if (modal) closeModal(modal.id);
         });
     });
 
@@ -692,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 triggerHapticFeedback();
-                overlay.classList.add('hidden');
+                closeModal(overlay.id);
             }
         });
     });
@@ -720,12 +761,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Edit Quick Apps Button
     const btnEditQuickApps = document.getElementById('btn-edit-quick-apps');
-    btnEditQuickApps.addEventListener('click', () => {
+    const btnEditAllApps = document.getElementById('btn-edit-all-apps');
+    function toggleQuickAppsEditing() {
         triggerHapticFeedback();
         editModeQuickApps = !editModeQuickApps;
         btnEditQuickApps.classList.toggle('active', editModeQuickApps);
         btnEditQuickApps.textContent = editModeQuickApps ? 'Done' : 'Edit';
+        btnEditAllApps.textContent = editModeQuickApps ? 'Done' : 'Edit';
+        btnEditAllApps.classList.toggle('active', editModeQuickApps);
         renderQuickApps();
+    }
+    btnEditQuickApps.addEventListener('click', toggleQuickAppsEditing);
+    btnEditAllApps.addEventListener('click', toggleQuickAppsEditing);
+
+    document.getElementById('btn-show-all-apps').addEventListener('click', () => {
+        triggerHapticFeedback();
+        openModal('modal-all-apps');
+        document.querySelector('.apps-folder').focus();
+    });
+
+    document.getElementById('modal-all-apps').addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            closeModal('modal-all-apps');
+            document.getElementById('btn-show-all-apps').focus();
+        } else if (event.key === 'Tab') {
+            const buttons = Array.from(document.querySelectorAll('#modal-all-apps button'));
+            const first = buttons[0];
+            const last = buttons[buttons.length - 1];
+            if (event.shiftKey && (document.activeElement === first || document.activeElement.classList.contains('apps-folder'))) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
     });
 
     // ==========================================================================
@@ -840,7 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 optMoveLeft.style.opacity = '1';
                 optMoveLeft.style.pointerEvents = 'auto';
             }
-            if (idx === -1 || idx >= apps.length - 1 || apps[idx + 1].id === 'qa-iptv') {
+            if (idx === -1 || idx >= apps.length - 1) {
                 optMoveRight.style.opacity = '0.3';
                 optMoveRight.style.pointerEvents = 'none';
             } else {
@@ -929,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerHapticFeedback();
             let apps = getQuickApps();
             const idx = apps.findIndex(a => a.id === selectedItem.id);
-            if (idx !== -1 && idx < apps.length - 1 && apps[idx + 1].id !== 'qa-iptv') {
+            if (idx !== -1 && idx < apps.length - 1) {
                 // Swap position
                 const temp = apps[idx];
                 apps[idx] = apps[idx + 1];
@@ -1168,16 +1238,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (redirectScreen) redirectScreen.classList.add('hidden');
         const progress = document.getElementById('redirect-progress');
         if (progress) progress.style.width = '0%';
-    });
-
-    // IPTV Selector Modal Web Player Choices click event
-    document.querySelectorAll('.iptv-choice-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            triggerHapticFeedback();
-            closeModal('modal-iptv-selector');
-            const playerUrl = btn.getAttribute('data-url');
-            launch(playerUrl, 'optimized');
-        });
     });
 
     // ==========================================================================

@@ -53,3 +53,4 @@ assets/archive/design-assets/
 test-results/
 playwright-report/
 .playwright/
+.playwright-cli/
