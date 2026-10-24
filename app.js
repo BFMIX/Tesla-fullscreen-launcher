@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let editModeFavorites = false;
     let editModeQuickApps = false;
+    let quickAppDrag = null;
 
     // Settings defaults
     const defaultSettings = {
@@ -413,6 +414,22 @@ document.addEventListener('DOMContentLoaded', () => {
             tvium.name = 'IPTV (Tvium)';
             localStorage.setItem(appsKeyV6, JSON.stringify(appsList));
         }
+        if (!localStorage.getItem('tesla_launcher_tvium_home_v2')) {
+            const tviumIndex = appsList.findIndex(app => app.id === 'qa-tvium');
+            const tviumApp = tviumIndex >= 0
+                ? appsList.splice(tviumIndex, 1)[0]
+                : { ...DEFAULT_QUICK_APPS.find(app => app.id === 'qa-tvium') };
+            const homeCount = getHomeQuickAppCount();
+            const jellyfinIndex = appsList.findIndex(app => app.name.trim().toLowerCase() === 'jellyfin');
+            if (jellyfinIndex >= 0 && jellyfinIndex < homeCount) {
+                const jellyfin = appsList.splice(jellyfinIndex, 1, tviumApp)[0];
+                appsList.push(jellyfin);
+            } else {
+                appsList.splice(Math.min(homeCount - 1, appsList.length), 0, tviumApp);
+            }
+            localStorage.setItem(appsKeyV6, JSON.stringify(appsList));
+            localStorage.setItem('tesla_launcher_tvium_home_v2', '1');
+        }
         return appsList;
     }
 
@@ -568,9 +585,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Quick Apps Dynamic Render ---
+    function getHomeQuickAppCount() {
+        const grid = document.getElementById('quick-apps-grid');
+        const style = getComputedStyle(grid);
+        const cardWidth = parseFloat(style.getPropertyValue('--quick-app-width')) || 132;
+        const gap = parseFloat(style.columnGap) || 12;
+        return Math.max(4, Math.floor((grid.clientWidth + gap) / (cardWidth + gap)) - 1);
+    }
+
     function renderQuickApps() {
         const apps = getQuickApps();
-        renderQuickAppsGrid('quick-apps-grid', apps.slice(0, 8));
+        renderQuickAppsGrid('quick-apps-grid', apps.slice(0, getHomeQuickAppCount()));
         renderQuickAppsGrid('all-apps-grid', apps);
     }
 
@@ -578,11 +603,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById(gridId);
         if (!grid) return;
         grid.innerHTML = '';
+        grid.classList.toggle('is-editing', editModeQuickApps);
 
         apps.forEach(app => {
             const btn = document.createElement('button');
             btn.className = 'quick-app-btn';
             btn.setAttribute('data-id', app.id);
+            btn.setAttribute('aria-label', app.name);
             
             const faviconUrl = getFaviconUrl(app.url);
 
@@ -622,7 +649,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('keydown', event => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    launch(app.lastUrl || app.url, app.launchMode || 'optimized');
+                    if (editModeQuickApps) openOptionsModal(app, false, true);
+                    else launch(app.lastUrl || app.url, app.launchMode || 'optimized');
                 }
             });
             grid.appendChild(btn);
@@ -648,6 +676,114 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.appendChild(addBtn);
     }
 
+    // Pointer events support finger dragging without relying on HTML drag-and-drop.
+    function setupQuickAppReordering(grid) {
+        function moveTarget() {
+            const drag = quickAppDrag;
+            if (!drag || !drag.active) return;
+            const target = document.elementFromPoint(drag.x, drag.y)?.closest('.quick-app-btn');
+            if (!target || target === drag.element || target.parentElement !== grid) return;
+            if (target.classList.contains('add-quick-app-btn')) {
+                grid.insertBefore(drag.element, target);
+                return;
+            }
+            const cards = Array.from(grid.querySelectorAll('[data-id]'));
+            grid.insertBefore(drag.element, cards.indexOf(drag.element) < cards.indexOf(target) ? target.nextSibling : target);
+        }
+
+        function scrollAtEdge() {
+            const drag = quickAppDrag;
+            if (!drag || !drag.active || drag.grid !== grid) return;
+            const bounds = grid.getBoundingClientRect();
+            if (grid.id === 'all-apps-grid') {
+                const delta = drag.y < bounds.top + 40 ? -10 : drag.y > bounds.bottom - 40 ? 10 : 0;
+                grid.scrollTop += delta;
+            } else {
+                const delta = drag.x < bounds.left + 40 ? -10 : drag.x > bounds.right - 40 ? 10 : 0;
+                grid.scrollLeft += delta;
+            }
+            moveTarget();
+            drag.frame = requestAnimationFrame(scrollAtEdge);
+        }
+
+        grid.addEventListener('pointerdown', event => {
+            const element = event.target.closest('.quick-app-btn[data-id]');
+            if (!editModeQuickApps || !element || event.button !== 0 || quickAppDrag || event.target.closest('.card-delete-badge')) return;
+            event.preventDefault();
+            const bounds = element.getBoundingClientRect();
+            quickAppDrag = {
+                grid, element, id: element.dataset.id, pointerId: event.pointerId,
+                startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY,
+                offsetX: event.clientX - bounds.left, offsetY: event.clientY - bounds.top,
+                active: false, frame: 0, preview: null
+            };
+            element.setPointerCapture(event.pointerId);
+        });
+
+        grid.addEventListener('pointermove', event => {
+            const drag = quickAppDrag;
+            if (!drag || drag.grid !== grid || drag.pointerId !== event.pointerId) return;
+            drag.x = event.clientX;
+            drag.y = event.clientY;
+            if (!drag.active && Math.hypot(drag.x - drag.startX, drag.y - drag.startY) >= 8) {
+                drag.active = true;
+                const bounds = drag.element.getBoundingClientRect();
+                const style = getComputedStyle(drag.element);
+                drag.preview = drag.element.cloneNode(true);
+                drag.preview.removeAttribute('data-id');
+                drag.preview.removeAttribute('aria-label');
+                drag.preview.setAttribute('aria-hidden', 'true');
+                drag.preview.tabIndex = -1;
+                drag.preview.classList.add('quick-app-drag-preview');
+                Object.assign(drag.preview.style, { width: bounds.width + 'px', height: bounds.height + 'px', fontSize: style.fontSize, gap: style.gap });
+                const icon = drag.element.querySelector('img');
+                drag.preview.style.setProperty('--drag-icon-size', getComputedStyle(icon).width);
+                document.body.appendChild(drag.preview);
+                drag.element.classList.add('is-dragging');
+                triggerHapticFeedback();
+                drag.frame = requestAnimationFrame(scrollAtEdge);
+            }
+            if (drag.active) {
+                event.preventDefault();
+                drag.preview.style.transform = `translate3d(${drag.x - drag.offsetX}px, ${drag.y - drag.offsetY}px, 0)`;
+                moveTarget();
+            }
+        });
+
+        grid.addEventListener('pointerup', event => {
+            const drag = quickAppDrag;
+            if (!drag || drag.grid !== grid || drag.pointerId !== event.pointerId) return;
+            if (drag.active) finishQuickAppDrag(true);
+            else {
+                const app = getQuickApps().find(item => item.id === drag.id);
+                finishQuickAppDrag(false);
+                if (app) openOptionsModal(app, false, true);
+            }
+        });
+        grid.addEventListener('pointercancel', () => {
+            if (quickAppDrag?.grid === grid) finishQuickAppDrag(false);
+        });
+    }
+
+    function finishQuickAppDrag(commit) {
+        const drag = quickAppDrag;
+        if (!drag) return;
+        quickAppDrag = null;
+        cancelAnimationFrame(drag.frame);
+        drag.preview?.remove();
+        if (drag.element.hasPointerCapture(drag.pointerId)) drag.element.releasePointerCapture(drag.pointerId);
+        if (commit) {
+            const order = Array.from(drag.grid.querySelectorAll('[data-id]'), element => element.dataset.id);
+            const ids = new Set(order);
+            const apps = getQuickApps();
+            const byId = new Map(apps.map(app => [app.id, app]));
+            let index = 0;
+            saveQuickApps(apps.map(app => ids.has(app.id) ? byId.get(order[index++]) : app));
+        } else renderQuickApps();
+        const card = Array.from(drag.grid.querySelectorAll('[data-id]')).find(element => element.dataset.id === drag.id);
+        card?.focus({ preventScroll: true });
+    }
+
     // Handles tap vs long press for tactile comfort
     function setupCardInteraction(element, item, isRecent, isQuickApp) {
         let pressTimer = null;
@@ -655,6 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let isScrolling = false;
 
         const startPress = (e) => {
+            if (isQuickApp && editModeQuickApps) return;
             if (e.target.closest('.card-delete-badge')) return;
             isLongPress = false;
             isScrolling = false;
@@ -671,6 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const endPress = (e) => {
+            if (isQuickApp && editModeQuickApps) return;
             if (e.target.closest('.card-delete-badge')) return;
             clearTimeout(pressTimer);
             if (isScrolling) return;
@@ -705,6 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeModal(id) {
+        if (id === 'modal-all-apps' && quickAppDrag?.grid.id === 'all-apps-grid') finishQuickAppDrag(false);
         const modal = document.getElementById(id);
         if (modal) {
             if (id === 'modal-all-apps' && modal.contains(document.activeElement)) {
@@ -1245,6 +1384,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
 
     applySettings();
+    setupQuickAppReordering(document.getElementById('quick-apps-grid'));
+    setupQuickAppReordering(document.getElementById('all-apps-grid'));
+    let quickAppsResizeFrame = 0;
+    window.addEventListener('resize', () => {
+        cancelAnimationFrame(quickAppsResizeFrame);
+        quickAppsResizeFrame = requestAnimationFrame(() => {
+            if (quickAppDrag) finishQuickAppDrag(false);
+            else renderQuickApps();
+        });
+    });
     setInterval(updateClockDisplay, 1000);
     renderFavorites();
     renderQuickApps();
